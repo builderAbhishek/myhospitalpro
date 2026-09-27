@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Medicine — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight" id="page-title">Edit Medicine</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Modify pricing, dosage strengths, reorder levels and compliance rules</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Cancel</a>
+                    <button type="submit" form="medicine-form" class="btn-primary text-xs py-2 px-4 shadow-sm">
+                        <span>Update Changes</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Edit Medicine Master Form -->
+            <form id="medicine-form" onsubmit="handleUpdateMedicine(event)" class="space-y-6 max-w-5xl">
+                <input type="hidden" id="med-id">
+
+                <!-- Section 1: Basic Information -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">1</span>
+                            <span>Basic Product Information</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="lg:col-span-2">
+                            <label class="form-label" for="med-name">Medicine Name <span class="text-rose-500">*</span></label>
+                            <input type="text" id="med-name" required class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-brand">Trade / Brand Name</label>
+                            <input type="text" id="med-brand" class="form-input text-sm">
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="form-label" for="med-generic">Generic Name / Active Salt <span class="text-rose-500">*</span></label>
+                            <input type="text" id="med-generic" required class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-manufacturer">Manufacturer / Pharma Company</label>
+                            <input type="text" id="med-manufacturer" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-category">Category <span class="text-rose-500">*</span></label>
+                            <select id="med-category" required class="form-select text-sm">
+                                <option value="Tablet">Tablet</option>
+                                <option value="Capsule">Capsule</option>
+                                <option value="Syrup / Liquid">Syrup / Liquid</option>
+                                <option value="Powder / Sachet">Powder / Sachet</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Ointment / Gel">Ointment / Gel</option>
+                                <option value="Inhaler">Inhaler</option>
+                                <option value="Eye / Ear Drops">Eye / Ear Drops</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-strength">Dosage &amp; Strength</label>
+                            <input type="text" id="med-strength" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-pack">Pack Size</label>
+                            <input type="text" id="med-pack" class="form-input text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Commercial & Tax Pricing -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">2</span>
+                            <span>Commercial &amp; Tax Pricing</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div>
+                            <label class="form-label" for="med-purchase">Purchase Rate (₹)</label>
+                            <input type="number" step="0.01" id="med-purchase" required class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-mrp">Maximum Retail Price (₹)</label>
+                            <input type="number" step="0.01" id="med-mrp" required class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-selling">Selling Price (₹)</label>
+                            <input type="number" step="0.01" id="med-selling" required class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-discount">Default Discount (%)</label>
+                            <input type="number" step="0.5" id="med-discount" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-gst">GST Slab (%)</label>
+                            <select id="med-gst" class="form-select text-sm">
+                                <option value="0">0% (Nil)</option>
+                                <option value="5">5% GST</option>
+                                <option value="12">12% GST (Medicines)</option>
+                                <option value="18">18% GST</option>
+                                <option value="28">28% GST</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-hsn">HSN Code</label>
+                            <input type="text" id="med-hsn" class="form-input text-sm font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Inventory Thresholds & Storage -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">3</span>
+                            <span>Inventory Thresholds &amp; Storage Location</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="form-label" for="med-min-stock">Minimum Safety Stock</label>
+                            <input type="number" id="med-min-stock" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-reorder">Reorder Trigger Level</label>
+                            <input type="number" id="med-reorder" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-max-stock">Maximum Stock Capacity</label>
+                            <input type="number" id="med-max-stock" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-rack">Rack / Bin Location</label>
+                            <input type="text" id="med-rack" class="form-input text-sm font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Identification & Compliance -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">4</span>
+                            <span>Identification &amp; Statutory Compliance</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="form-label" for="med-code">Medicine Code</label>
+                            <input type="text" id="med-code" readonly class="form-input text-sm font-mono bg-slate-50 cursor-not-allowed">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-barcode">Barcode / EAN</label>
+                            <input type="text" id="med-barcode" class="form-input text-sm font-mono">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-prescription">Prescription Required?</label>
+                            <select id="med-prescription" class="form-select text-sm">
+                                <option value="false">No (Over-The-Counter OTC)</option>
+                                <option value="true">Yes (Rx Required)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-schedule">Drug Schedule</label>
+                            <select id="med-schedule" class="form-select text-sm">
+                                <option value="General (OTC)">General (OTC)</option>
+                                <option value="Schedule H">Schedule H (Prescription)</option>
+                                <option value="Schedule H1">Schedule H1 (High Risk / Antibiotic)</option>
+                                <option value="Schedule X">Schedule X (Narcotic / Sedative)</option>
+                                <option value="Schedule G">Schedule G</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-appborder">
+                    <a href="index.html" class="btn-secondary text-sm">Cancel</a>
+                    <button type="submit" class="btn-primary text-sm shadow-md">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let currentMedicine = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const medId = Utils.getUrlParam('id') || 1;
+            currentMedicine = MHP_DB.getMedicineById(medId);
+
+            Components.initLayout('medicines', 'Edit Medicine', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Medicines', path: 'medicines/index.html' },
+                { label: currentMedicine ? currentMedicine.name : 'Edit Medicine', path: `medicines/edit.html?id=${medId}` }
+            ]);
+
+            if (!currentMedicine) {
+                showToast('Medicine not found in database', 'error');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+
+            populateForm(currentMedicine);
+        });
+
+        function populateForm(m) {
+            document.getElementById('med-id').value = m.id;
+            document.getElementById('med-name').value = m.name || '';
+            document.getElementById('med-brand').value = m.brand || '';
+            document.getElementById('med-generic').value = m.genericName || '';
+            document.getElementById('med-manufacturer').value = m.manufacturer || '';
+            document.getElementById('med-category').value = m.category || 'Tablet';
+            document.getElementById('med-strength').value = m.strength || '';
+            document.getElementById('med-pack').value = m.packSize || '';
+            document.getElementById('med-purchase').value = m.purchasePrice || 0;
+            document.getElementById('med-mrp').value = m.mrp || 0;
+            document.getElementById('med-selling').value = m.sellingPrice || 0;
+            document.getElementById('med-discount').value = m.discount || 0;
+            document.getElementById('med-gst').value = m.gst || 12;
+            document.getElementById('med-hsn').value = m.hsn || '30049099';
+            document.getElementById('med-min-stock').value = m.minStock || 15;
+            document.getElementById('med-reorder').value = m.reorderLevel || 30;
+            document.getElementById('med-max-stock').value = m.maxStock || 500;
+            document.getElementById('med-rack').value = m.rackNumber || '';
+            document.getElementById('med-code').value = m.medicineCode || `MED-${String(m.id).padStart(4, '0')}`;
+            document.getElementById('med-barcode').value = m.barcode || '';
+            document.getElementById('med-prescription').value = String(m.prescriptionRequired === true);
+            document.getElementById('med-schedule').value = m.scheduleType || 'General (OTC)';
+
+            document.getElementById('page-title').innerText = `Edit ${m.name}`;
+        }
+
+        function handleUpdateMedicine(e) {
+            e.preventDefault();
+            const updated = {
+                id: Number(document.getElementById('med-id').value),
+                name: document.getElementById('med-name').value.trim(),
+                brand: document.getElementById('med-brand').value.trim(),
+                genericName: document.getElementById('med-generic').value.trim(),
+                manufacturer: document.getElementById('med-manufacturer').value.trim(),
+                category: document.getElementById('med-category').value,
+                strength: document.getElementById('med-strength').value.trim(),
+                packSize: document.getElementById('med-pack').value.trim(),
+                purchasePrice: Number(document.getElementById('med-purchase').value) || 0,
+                mrp: Number(document.getElementById('med-mrp').value) || 0,
+                sellingPrice: Number(document.getElementById('med-selling').value) || 0,
+                discount: Number(document.getElementById('med-discount').value) || 0,
+                gst: Number(document.getElementById('med-gst').value) || 12,
+                hsn: document.getElementById('med-hsn').value.trim(),
+                minStock: Number(document.getElementById('med-min-stock').value) || 15,
+                reorderLevel: Number(document.getElementById('med-reorder').value) || 30,
+                maxStock: Number(document.getElementById('med-max-stock').value) || 500,
+                rackNumber: document.getElementById('med-rack').value.trim(),
+                medicineCode: document.getElementById('med-code').value,
+                barcode: document.getElementById('med-barcode').value.trim(),
+                prescriptionRequired: document.getElementById('med-prescription').value === 'true',
+                scheduleType: document.getElementById('med-schedule').value,
+                batches: currentMedicine.batches || []
+            };
+
+            MHP_DB.saveMedicine(updated);
+            showToast('Medicine updated successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = `view.html?id=${updated.id}`;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Details — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight" id="med-title">Loading...</h1>
+                            <span id="med-schedule-badge" class="badge badge-info">OTC</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5" id="med-subtitle">Active Pharmaceutical Item</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Back to List</a>
+                    <button type="button" onclick="openAddBatchModal()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Add Batch</span>
+                    </button>
+                    <a id="edit-link" href="edit.html" class="btn-primary text-xs py-2 px-4 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        <span>Edit Medicine</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Stock Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Current Stock</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-total-stock">0</div>
+                    <span class="text-xs text-slate-400 mt-1 block" id="stat-reorder-note">Reorder Level: 30</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Inventory Value (Cost)</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-cost-val">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">At Purchase Rate</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Inventory Value (MRP)</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-mrp-val">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Maximum Realizable</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Selling Price</span>
+                    <div class="text-2xl font-extrabold text-teal-700" id="stat-selling-price">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block" id="stat-gst-note">GST 12% included</span>
+                </div>
+            </div>
+
+            <!-- Medicine Profile & Compliance Specs -->
+            <div class="app-card p-5">
+                <h3 class="text-sm font-bold text-slate-900 pb-3 mb-3 border-b border-appborder flex items-center justify-between">
+                    <span>Formulary &amp; Storage Profile</span>
+                    <span class="text-xs text-slate-400 font-mono" id="stat-code">MED-0001</span>
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-xs">
+                    <div>
+                        <span class="text-slate-400 block font-medium">Generic / Salt</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="spec-generic">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Manufacturer</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="spec-mfg">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Rack / Bin Location</span>
+                        <span class="font-bold text-slate-900 font-mono text-sm" id="spec-rack">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">HSN / Tax Slab</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="spec-hsn">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Dosage &amp; Strength</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="spec-strength">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Barcode / EAN</span>
+                        <span class="font-mono text-slate-800 text-sm" id="spec-barcode">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabbed Sub-Modules: Batches, Sales History, Purchase History, Movement Log -->
+            <div class="app-card overflow-hidden">
+                <div class="border-b border-appborder bg-surface-alt px-4 flex items-center gap-4 text-xs font-semibold">
+                    <button onclick="switchTab('batches', this)" class="detail-tab py-3.5 border-b-2 border-primary text-primary">
+                        Active Batches (<span id="batch-count-pill">0</span>)
+                    </button>
+                    <button onclick="switchTab('sales', this)" class="detail-tab py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+                        Sales Transactions
+                    </button>
+                    <button onclick="switchTab('purchases', this)" class="detail-tab py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+                        Purchase Invoices
+                    </button>
+                    <button onclick="switchTab('movements', this)" class="detail-tab py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+                        Stock Movement Audit
+                    </button>
+                </div>
+
+                <!-- Tab 1: Active Batches Table -->
+                <div id="tab-batches" class="tab-pane overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Batch No</th>
+                                <th>Expiry Date</th>
+                                <th class="text-right">Purchase Rate</th>
+                                <th class="text-right">MRP</th>
+                                <th class="text-right">Quantity</th>
+                                <th>Expiry Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batches-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 2: Sales History -->
+                <div id="tab-sales" class="tab-pane hidden overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Customer</th>
+                                <th>Batch</th>
+                                <th>Date</th>
+                                <th class="text-right">Qty</th>
+                                <th class="text-right">Rate</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 3: Purchase History -->
+                <div id="tab-purchases" class="tab-pane hidden overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Purchase Bill #</th>
+                                <th>Supplier</th>
+                                <th>Batch</th>
+                                <th>Date</th>
+                                <th class="text-right">Qty Received</th>
+                                <th class="text-right">Rate</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchases-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 4: Stock Movement Audit -->
+                <div id="tab-movements" class="tab-pane hidden overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Batch</th>
+                                <th>Reference</th>
+                                <th class="text-right">Quantity Delta</th>
+                                <th>User / Source</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movements-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Quick Add Batch Modal -->
+    <div id="add-batch-modal" class="modal-backdrop hidden">
+        <div class="bg-surface border border-appborder rounded-xl shadow-2xl max-w-md w-full p-6" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between pb-3 border-b border-appborder mb-4">
+                <h3 class="text-base font-bold text-slate-900">Add Medicine Batch</h3>
+                <button onclick="closeAddBatchModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <form onsubmit="handleSaveBatch(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="form-label">Batch Number *</label>
+                    <input type="text" id="new-batch-no" required placeholder="e.g. PCM26C" class="form-input text-xs font-mono uppercase">
+                </div>
+                <div>
+                    <label class="form-label">Expiry Date *</label>
+                    <input type="month" id="new-batch-expiry" required class="form-input text-xs">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="form-label">Purchase Rate (₹)</label>
+                        <input type="number" step="0.01" id="new-batch-rate" required class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label">MRP (₹)</label>
+                        <input type="number" step="0.01" id="new-batch-mrp" required class="form-input text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Opening Quantity *</label>
+                    <input type="number" id="new-batch-qty" required min="1" value="50" class="form-input text-xs">
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-appborder">
+                    <button type="button" onclick="closeAddBatchModal()" class="btn-secondary text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary text-xs">Add Batch to Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let currentMedicine = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const medId = Utils.getUrlParam('id') || 1;
+            currentMedicine = MHP_DB.getMedicineById(medId);
+
+            Components.initLayout('medicines', 'Medicine Profile', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Medicines', path: 'medicines/index.html' },
+                { label: currentMedicine ? currentMedicine.name : 'Details', path: `medicines/view.html?id=${medId}` }
+            ]);
+
+            if (!currentMedicine) {
+                showToast('Medicine not found in database', 'error');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+
+            renderMedicineDetails(currentMedicine);
+        });
+
+        function renderMedicineDetails(m) {
+            document.getElementById('med-title').innerText = m.name;
+            document.getElementById('med-subtitle').innerText = `${m.genericName || ''} • ${m.brand || ''}`;
+            document.getElementById('edit-link').href = `edit.html?id=${m.id}`;
+
+            const sched = m.scheduleType || 'General (OTC)';
+            const schedBadge = document.getElementById('med-schedule-badge');
+            schedBadge.innerText = sched;
+            if (sched.includes('H1') || sched.includes('X')) {
+                schedBadge.className = 'badge badge-danger';
+            } else if (sched.includes('H')) {
+                schedBadge.className = 'badge badge-warning';
+            } else {
+                schedBadge.className = 'badge badge-info';
+            }
+
+            // Specs
+            document.getElementById('stat-code').innerText = m.medicineCode || `MED-${String(m.id).padStart(4, '0')}`;
+            document.getElementById('spec-generic').innerText = m.genericName || '—';
+            document.getElementById('spec-mfg').innerText = m.manufacturer || '—';
+            document.getElementById('spec-rack').innerText = m.rackNumber || 'N/A';
+            document.getElementById('spec-hsn').innerText = `${m.hsn || '3004'} (${m.gst || 12}% GST)`;
+            document.getElementById('spec-strength').innerText = `${m.strength || 'N/A'} • ${m.packSize || ''}`;
+            document.getElementById('spec-barcode').innerText = m.barcode || 'N/A';
+
+            // Calculate Stock Totals
+            const batches = m.batches || [];
+            const totalStock = batches.reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
+            const totalCostVal = batches.reduce((acc, b) => acc + ((Number(b.quantity) || 0) * (Number(b.purchaseRate) || Number(m.purchasePrice) || 0)), 0);
+            const totalMrpVal = batches.reduce((acc, b) => acc + ((Number(b.quantity) || 0) * (Number(b.mrp) || Number(m.mrp) || 0)), 0);
+
+            document.getElementById('stat-total-stock').innerText = totalStock;
+            document.getElementById('stat-reorder-note').innerText = `Reorder Trigger Level: ${m.reorderLevel || 30}`;
+            document.getElementById('stat-cost-val').innerText = Utils.formatINR(totalCostVal);
+            document.getElementById('stat-mrp-val').innerText = Utils.formatINR(totalMrpVal);
+            document.getElementById('stat-selling-price').innerText = Utils.formatINR(m.sellingPrice);
+            document.getElementById('stat-gst-note').innerText = `MRP: ${Utils.formatINR(m.mrp)} (Includes ${m.gst || 12}% GST)`;
+
+            document.getElementById('batch-count-pill').innerText = batches.length;
+
+            renderBatchesTable(batches);
+            renderSalesTable(m.id);
+            renderPurchasesTable(m.id);
+            renderMovementsTable(m);
+        }
+
+        function renderBatchesTable(batches) {
+            const tbody = document.getElementById('batches-tbody');
+            if (!batches.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">No active batches for this medicine</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = batches.map(b => {
+                const expStatus = Utils.getExpiryStatus(b.expiry);
+                return `
+                    <tr>
+                        <td class="font-mono font-bold text-slate-900">${b.batchNo}</td>
+                        <td class="text-slate-700">${Utils.formatDate(b.expiry)}</td>
+                        <td class="text-right text-slate-600">${Utils.formatINR(b.purchaseRate)}</td>
+                        <td class="text-right text-slate-600">${Utils.formatINR(b.mrp)}</td>
+                        <td class="text-right font-bold text-slate-900">${b.quantity}</td>
+                        <td><span class="badge ${expStatus.badgeClass}">${expStatus.label}</span></td>
+                        <td class="text-right">
+                            <a href="../inventory/stock-adjustment.html" class="btn-secondary text-[11px] py-1 px-2">Adjust</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderSalesTable(medId) {
+            const tbody = document.getElementById('sales-tbody');
+            const allSales = MHP_DB.getSales();
+            const relevant = [];
+
+            allSales.forEach(s => {
+                (s.items || []).forEach(item => {
+                    if (Number(item.medicineId) === Number(medId)) {
+                        relevant.push({ ...item, invoiceNo: s.invoiceNo, date: s.date, customerName: s.customerName });
+                    }
+                });
+            });
+
+            if (!relevant.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">No sales transactions recorded for this medicine</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = relevant.map(r => `
+                <tr>
+                    <td class="font-bold text-slate-900">
+                        <a href="../billing/invoice.html?id=${r.invoiceNo}" class="text-primary hover:underline">${r.invoiceNo}</a>
+                    </td>
+                    <td class="text-slate-800">${r.customerName}</td>
+                    <td class="font-mono text-xs">${r.batchNo || '—'}</td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(r.date)}</td>
+                    <td class="text-right font-bold text-slate-900">${r.qty}</td>
+                    <td class="text-right">${Utils.formatINR(r.rate)}</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(r.total)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPurchasesTable(medId) {
+            const tbody = document.getElementById('purchases-tbody');
+            const allPurchases = MHP_DB.getPurchases();
+            const relevant = [];
+
+            allPurchases.forEach(p => {
+                (p.items || []).forEach(item => {
+                    if (Number(item.medicineId) === Number(medId)) {
+                        relevant.push({ ...item, invoiceNo: p.invoiceNo, date: p.invoiceDate, supplierName: p.supplierName });
+                    }
+                });
+            });
+
+            if (!relevant.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">No purchase vendor bills recorded for this medicine</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = relevant.map(r => `
+                <tr>
+                    <td class="font-bold text-slate-900">
+                        <a href="../purchases/view.html?id=${r.invoiceNo}" class="text-primary hover:underline">${r.invoiceNo}</a>
+                    </td>
+                    <td class="text-slate-800">${r.supplierName}</td>
+                    <td class="font-mono text-xs">${r.batchNo || '—'}</td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(r.date)}</td>
+                    <td class="text-right font-bold text-slate-900">${r.qty} units (+${r.free || 0} free)</td>
+                    <td class="text-right">${Utils.formatINR(r.rate)}</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(r.total)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderMovementsTable(m) {
+            const tbody = document.getElementById('movements-tbody');
+            const movements = [
+                { date: "2026-09-27", type: "Sale Outflow", batch: "PCM26A", ref: "INV-2026-0042", delta: "-2 units", user: "POS Counter 1" },
+                { date: "2026-09-22", type: "Purchase Inward", batch: "PCM26A", ref: "PUR-2026-0891", delta: "+220 units", user: "Apollo Inward" },
+                { date: "2026-09-15", type: "Stock Count Audit", batch: "PCM25X", ref: "AUDIT-001", delta: "0 variance", user: "Dr. Arvind Sharma" }
+            ];
+
+            tbody.innerHTML = movements.map(mov => `
+                <tr>
+                    <td class="text-xs text-slate-500">${mov.date}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${mov.type}</span></td>
+                    <td class="font-mono text-xs">${mov.batch}</td>
+                    <td class="text-xs font-mono text-slate-600">${mov.ref}</td>
+                    <td class="text-right font-bold ${mov.delta.startsWith('-') ? 'text-rose-600' : 'text-emerald-700'}">${mov.delta}</td>
+                    <td class="text-xs text-slate-500">${mov.user}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tabKey, btn) {
+            document.querySelectorAll('.detail-tab').forEach(b => {
+                b.classList.remove('border-primary', 'text-primary');
+                b.classList.add('border-transparent', 'text-slate-500');
+            });
+            btn.classList.add('border-primary', 'text-primary');
+            btn.classList.remove('border-transparent', 'text-slate-500');
+
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabKey}`);
+            if (target) target.classList.remove('hidden');
+        }
+
+        function openAddBatchModal() {
+            document.getElementById('new-batch-rate').value = currentMedicine.purchasePrice || 0;
+            document.getElementById('new-batch-mrp').value = currentMedicine.mrp || 0;
+            document.getElementById('add-batch-modal').classList.remove('hidden');
+        }
+
+        function closeAddBatchModal() {
+            document.getElementById('add-batch-modal').classList.add('hidden');
+        }
+
+        function handleSaveBatch(e) {
+            e.preventDefault();
+            const batchNo = document.getElementById('new-batch-no').value.trim().toUpperCase();
+            const expiry = document.getElementById('new-batch-expiry').value + '-28';
+            const rate = Number(document.getElementById('new-batch-rate').value) || 0;
+            const mrp = Number(document.getElementById('new-batch-mrp').value) || 0;
+            const qty = Number(document.getElementById('new-batch-qty').value) || 0;
+
+            currentMedicine.batches = currentMedicine.batches || [];
+            currentMedicine.batches.push({
+                id: Math.floor(1000 + Math.random() * 9000),
+                batchNo,
+                expiry,
+                purchaseRate: rate,
+                mrp,
+                quantity: qty
+            });
+
+            MHP_DB.saveMedicine(currentMedicine);
+            closeAddBatchModal();
+            showToast(`Batch ${batchNo} added successfully!`, 'success');
+            renderMedicineDetails(currentMedicine);
+        }
+    </script>
+</body>
+</html>

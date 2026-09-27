@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Supplier / Distributor — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Add Pharmaceutical Supplier</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Register a authorized wholesale distributor or pharmaceutical manufacturer</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supplier Registration Form -->
+            <form id="supplier-form" onsubmit="handleSaveSupplier(event)" class="app-card p-6 space-y-5 max-w-4xl">
+                
+                <h3 class="text-sm font-bold text-slate-900 pb-2 border-b border-appborder">Distributor Organization Details</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="form-label" for="supp-name">Supplier / Firm Name *</label>
+                        <input type="text" id="supp-name" required placeholder="e.g. Vardhman Healthcare Agencies" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-company">Parent Company / Division</label>
+                        <input type="text" id="supp-company" placeholder="e.g. Cipla Authorized C&F" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-contact">Key Contact Person *</label>
+                        <input type="text" id="supp-contact" required placeholder="e.g. Rajesh Khurana" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-phone">Phone / Mobile Number *</label>
+                        <input type="tel" id="supp-phone" required placeholder="+91 98112 00000" class="form-input text-xs font-mono">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-email">Order Dispatch Email</label>
+                        <input type="email" id="supp-email" placeholder="orders@distributor.in" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-terms">Payment Terms / Credit Days</label>
+                        <select id="supp-terms" class="form-select text-xs">
+                            <option value="Immediate / Cash">Immediate / Cash</option>
+                            <option value="7 Days Net">7 Days Net</option>
+                            <option value="15 Days Net">15 Days Net</option>
+                            <option value="21 Days Net">21 Days Net</option>
+                            <option value="30 Days Net" selected>30 Days Net</option>
+                            <option value="45 Days Net">45 Days Net</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold text-slate-900 pt-3 pb-2 border-b border-appborder">Statutory GST &amp; Drug Licenses</h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                    <div>
+                        <label class="form-label" for="supp-gstin">GSTIN Number *</label>
+                        <input type="text" id="supp-gstin" required placeholder="07AAAAA0000A1Z5" class="form-input text-xs font-mono uppercase">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-dl">Drug Licence No (20B / 21B)</label>
+                        <input type="text" id="supp-dl" placeholder="DL-20B-112233 / 21B-112234" class="form-input text-xs font-mono uppercase">
+                    </div>
+                    <div>
+                        <label class="form-label" for="supp-city">Warehouse City</label>
+                        <input type="text" id="supp-city" value="Delhi" class="form-input text-xs">
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="form-label" for="supp-address">Billing &amp; Warehouse Address</label>
+                        <input type="text" id="supp-address" placeholder="e.g. Shop 12-14, Dawa Bazaar, Bhagirath Palace, Chandni Chowk" class="form-input text-xs">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label" for="supp-notes">Trade Remarks / Return Policies</label>
+                    <textarea id="supp-notes" rows="2" placeholder="Expiry return cutoff days, credit note policies..." class="form-textarea text-xs"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-appborder">
+                    <a href="index.html" class="btn-secondary text-xs">Cancel</a>
+                    <button type="submit" class="btn-primary text-xs shadow-md">
+                        Save Supplier Profile
+                    </button>
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('suppliers', 'Add Supplier', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Suppliers', path: 'suppliers/index.html' },
+                { label: 'Add Supplier', path: 'suppliers/add.html' }
+            ]);
+        });
+
+        function handleSaveSupplier(e) {
+            e.preventDefault();
+            const supplier = {
+                name: document.getElementById('supp-name').value.trim(),
+                company: document.getElementById('supp-company').value.trim(),
+                contactPerson: document.getElementById('supp-contact').value.trim(),
+                phone: document.getElementById('supp-phone').value.trim(),
+                email: document.getElementById('supp-email').value.trim(),
+                address: document.getElementById('supp-address').value.trim(),
+                city: document.getElementById('supp-city').value.trim() || 'Delhi',
+                state: 'Delhi',
+                pincode: '110006',
+                gstin: document.getElementById('supp-gstin').value.trim().toUpperCase(),
+                drugLicence: document.getElementById('supp-dl').value.trim().toUpperCase(),
+                paymentTerms: document.getElementById('supp-terms').value,
+                notes: document.getElementById('supp-notes').value.trim(),
+                totalPurchases: 0,
+                outstandingBalance: 0,
+                status: 'active'
+            };
+
+            const saved = MHP_DB.saveSupplier(supplier);
+            showToast(`${saved.name} registered as distributor!`, 'success');
+            setTimeout(() => {
+                window.location.href = `view.html?id=${saved.id}`;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

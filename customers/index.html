@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Directory — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Customer &amp; Patient Registry</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">Manage patient credit accounts, prescription histories, and receivables</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportCustomers()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <a href="add.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Add Customer</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Cards Strip -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Patients</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-total-cust">0</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Registered in pharmacy database</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Active Accounts</span>
+                    <div class="text-2xl font-extrabold text-emerald-700" id="stat-active-cust">0</div>
+                    <span class="text-xs text-emerald-600 font-medium mt-1 block">Purchased within 30 days</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Outstanding Dues</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="stat-cust-outstanding">₹0.00</div>
+                    <span class="text-xs text-amber-700 mt-1 block font-medium">Pending credit accounts</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Today's Footfall</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-today-cust">14</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Counter visits today</span>
+                </div>
+            </div>
+
+            <!-- Table Card with Search & Filters -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-sm">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="Search patient name, phone, city..." class="form-input pl-9 text-xs sm:text-sm">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="type-filter" onchange="applyFilters()" class="form-select text-xs">
+                            <option value="">All Customer Types</option>
+                            <option value="Regular Patient">Regular Patient</option>
+                            <option value="VIP / Hospital Staff">Hospital Staff</option>
+                            <option value="Chronic Care Patient">Chronic Care</option>
+                            <option value="Corporate / Institutional">Institutional OPD</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Patient / Customer</th>
+                                <th>Mobile Phone</th>
+                                <th>Customer Type</th>
+                                <th class="text-right">Total Purchases</th>
+                                <th class="text-right">Outstanding Due</th>
+                                <th>Last Visit</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="customers-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let allCustomers = [];
+        let filteredCustomers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('customers', 'Customers & Patients', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Customers', path: 'customers/index.html' }
+            ]);
+
+            loadCustomers();
+        });
+
+        function loadCustomers() {
+            allCustomers = MHP_DB.getCustomers();
+            filteredCustomers = [...allCustomers];
+
+            const total = allCustomers.length;
+            const active = allCustomers.filter(c => c.status === 'active').length;
+            const due = allCustomers.reduce((acc, c) => acc + (Number(c.outstanding) || 0), 0);
+
+            document.getElementById('stat-total-cust').innerText = total;
+            document.getElementById('stat-active-cust').innerText = active;
+            document.getElementById('stat-cust-outstanding').innerText = Utils.formatINR(due);
+
+            renderTable();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+            const type = document.getElementById('type-filter').value;
+
+            filteredCustomers = allCustomers.filter(c => {
+                const matchQ = !query ||
+                    c.name.toLowerCase().includes(query) ||
+                    (c.mobile && c.mobile.includes(query)) ||
+                    (c.city && c.city.toLowerCase().includes(query));
+                const matchT = !type || c.customerType === type;
+                return matchQ && matchT;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('customers-tbody');
+            const empty = document.getElementById('customers-empty');
+
+            if (!filteredCustomers.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'users',
+                    'No customers found',
+                    'No patient accounts match your current search query.',
+                    `<a href="add.html" class="btn-primary text-xs py-2 px-3.5">Add Customer</a>`
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredCustomers.map(c => `
+                <tr>
+                    <td>
+                        <a href="view.html?id=${c.id}" class="font-bold text-slate-900 hover:text-primary transition-colors block text-sm">
+                            ${c.name}
+                        </a>
+                        <span class="text-xs text-slate-400">${c.city || 'Delhi'}</span>
+                    </td>
+                    <td class="font-mono text-xs text-slate-700">${c.mobile || '—'}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${c.customerType || 'Patient'}</span></td>
+                    <td class="text-right font-medium text-slate-800">${Utils.formatINR(c.totalPurchases || 0)}</td>
+                    <td class="text-right font-bold ${Number(c.outstanding) > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                        ${Utils.formatINR(c.outstanding || 0)}
+                    </td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(c.lastPurchase)}</td>
+                    <td>${Components.renderStatusBadge(c.status || 'Active')}</td>
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1">
+                            <a href="view.html?id=${c.id}" class="btn-secondary text-xs py-1 px-2.5">
+                                View Profile
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportCustomers() {
+            const rows = filteredCustomers.map(c => ({
+                Name: c.name,
+                Mobile: c.mobile,
+                Email: c.email || '',
+                CustomerType: c.customerType,
+                City: c.city,
+                TotalPurchases: c.totalPurchases,
+                OutstandingDue: c.outstanding,
+                LastPurchase: c.lastPurchase,
+                CreditLimit: c.creditLimit || 0
+            }));
+            Utils.exportToCSV('MHP-Customers-Registry', rows);
+        }
+    </script>
+</body>
+</html>

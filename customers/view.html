@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Profile — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight" id="cust-title">Customer Profile</h1>
+                            <span id="cust-status-badge" class="badge badge-success">Active</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5" id="cust-subtitle">Patient Ledger &amp; Prescription History</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Back to Directory</a>
+                    <a href="../billing/index.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>New Counter Bill</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Summary & Financial Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Lifetime Purchases</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-cust-purchases">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Accumulated billing volume</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Paid Receipts</span>
+                    <div class="text-2xl font-extrabold text-emerald-700" id="stat-cust-paid">₹0.00</div>
+                    <span class="text-xs text-emerald-600 font-medium mt-1 block">Cash / UPI / Card cleared</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Outstanding Balance Due</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="stat-cust-outstanding">₹0.00</div>
+                    <span class="text-xs text-amber-700 font-medium mt-1 block" id="stat-cust-limit-note">Credit Limit: ₹5,000</span>
+                </div>
+            </div>
+
+            <!-- Personal Profile Card -->
+            <div class="app-card p-5">
+                <h3 class="text-sm font-bold text-slate-900 pb-2 mb-3 border-b border-appborder">Patient Registration Profile</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                    <div>
+                        <span class="text-slate-400 block font-medium">Contact Mobile</span>
+                        <span class="font-mono font-bold text-slate-800 text-sm" id="disp-cust-mobile">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Email Address</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="disp-cust-email">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Customer Category</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="disp-cust-type">—</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Location Address</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="disp-cust-address">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Invoices Table Card -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Invoices &amp; Counter Sales History</h3>
+                        <p class="text-xs text-slate-500">Every pharmacy sale transaction linked to this patient account</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Billing Date</th>
+                                <th class="text-right">Bill Amount</th>
+                                <th class="text-right">Amount Paid</th>
+                                <th class="text-right">Balance Due</th>
+                                <th>Payment Status</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cust-sales-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="cust-sales-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const custId = Utils.getUrlParam('id') || 1;
+            const customer = MHP_DB.getCustomerById(custId);
+
+            Components.initLayout('customers', 'Customer Ledger', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Customers', path: 'customers/index.html' },
+                { label: customer ? customer.name : 'Profile', path: `customers/view.html?id=${custId}` }
+            ]);
+
+            if (!customer) {
+                showToast('Customer profile not found', 'error');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+
+            renderCustomerProfile(customer);
+        });
+
+        function renderCustomerProfile(c) {
+            document.getElementById('cust-title').innerText = c.name;
+            document.getElementById('cust-subtitle').innerText = `${c.customerType} • Registered Patient`;
+
+            document.getElementById('disp-cust-mobile').innerText = c.mobile || '—';
+            document.getElementById('disp-cust-email').innerText = c.email || '—';
+            document.getElementById('disp-cust-type').innerText = c.customerType;
+            document.getElementById('disp-cust-address').innerText = `${c.address ? c.address + ', ' : ''}${c.city}`;
+
+            const sales = MHP_DB.getSales().filter(s => Number(s.customerId) === Number(c.id));
+            const totalBill = sales.reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0) || c.totalPurchases;
+            const totalDue = Number(c.outstanding) || 0;
+            const totalPaid = Math.max(0, totalBill - totalDue);
+
+            document.getElementById('stat-cust-purchases').innerText = Utils.formatINR(totalBill);
+            document.getElementById('stat-cust-paid').innerText = Utils.formatINR(totalPaid);
+            document.getElementById('stat-cust-outstanding').innerText = Utils.formatINR(totalDue);
+            document.getElementById('stat-cust-limit-note').innerText = `Credit Limit: ${Utils.formatINR(c.creditLimit || 5000)}`;
+
+            const tbody = document.getElementById('cust-sales-tbody');
+            const empty = document.getElementById('cust-sales-empty');
+
+            if (!sales.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'receipt',
+                    'No sales recorded',
+                    'This patient currently has no counter bills recorded in the system.'
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = sales.map(s => `
+                <tr>
+                    <td class="font-bold text-slate-900 font-mono">
+                        <a href="../billing/invoice.html?id=${s.invoiceNo}" class="text-primary hover:underline">${s.invoiceNo}</a>
+                    </td>
+                    <td class="text-xs text-slate-600">${Utils.formatDateTime(s.date)}</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(s.grandTotal)}</td>
+                    <td class="text-right text-emerald-700 font-medium">${Utils.formatINR(s.amountPaid || s.grandTotal)}</td>
+                    <td class="text-right font-bold ${Number(s.balance) > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                        ${Utils.formatINR(s.balance || 0)}
+                    </td>
+                    <td>${Components.renderStatusBadge(s.paymentStatus || 'Paid')}</td>
+                    <td class="text-right">
+                        <a href="../billing/invoice.html?id=${s.invoiceNo}" class="btn-secondary text-[11px] py-1 px-2.5">
+                            Print Invoice
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

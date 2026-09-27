@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Adjustment — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Stock Adjustment &amp; Reconciliation</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Reconcile physical inventory counts, write off damages, or quarantine expired batches</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Columns: Adjustment Form + Recent Adjustment Audit -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Adjustment Form (5 Cols) -->
+                <div class="lg:col-span-5 app-card p-5">
+                    <h3 class="text-sm font-bold text-slate-900 pb-2 mb-4 border-b border-appborder">Record Inventory Adjustment</h3>
+                    
+                    <form id="adjustment-form" onsubmit="handleSaveAdjustment(event)" class="space-y-4 text-xs">
+                        
+                        <div>
+                            <label class="form-label" for="adj-medicine">Medicine Product *</label>
+                            <select id="adj-medicine" required onchange="onMedicineSelect(this.value)" class="form-select text-xs">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="adj-batch">Batch Number *</label>
+                            <select id="adj-batch" required onchange="onBatchSelect()" class="form-select text-xs font-mono">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <!-- Current Stock Display Box -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+                            <span class="text-slate-600 font-medium">Recorded Current Stock:</span>
+                            <span class="text-sm font-black text-slate-900" id="adj-current-stock">0 units</span>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="adj-type">Adjustment Reason / Type *</label>
+                            <select id="adj-type" required onchange="updateCalculationPreview()" class="form-select text-xs font-semibold">
+                                <option value="Damage">Damage (Cap breakage / bottle leak)</option>
+                                <option value="Expired">Expired (Quarantine write-off)</option>
+                                <option value="Missing">Missing (Physical shortage variance)</option>
+                                <option value="Manual Correction">Manual Correction (Direct count count-in)</option>
+                                <option value="Return">Customer Return / Restock</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="adj-qty">Adjustment Quantity *</label>
+                            <input type="number" id="adj-qty" required min="1" value="1" oninput="updateCalculationPreview()" class="form-input text-xs font-bold">
+                        </div>
+
+                        <!-- Before & After Quantity Calculation Preview -->
+                        <div class="p-3 bg-teal-50 rounded-lg border border-teal-100 flex items-center justify-between text-teal-900">
+                            <span class="font-medium">Estimated New Balance:</span>
+                            <span class="text-sm font-black text-teal-700" id="adj-preview-new-stock">0 units</span>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="adj-reason">Primary Reason *</label>
+                            <input type="text" id="adj-reason" required placeholder="e.g. Expired batch moved to return bin" class="form-input text-xs">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="adj-notes">Audit Notes</label>
+                            <textarea id="adj-notes" rows="2" placeholder="Authorized by Chief Pharmacist..." class="form-textarea text-xs"></textarea>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full btn-primary text-xs py-2.5 font-bold shadow-sm">
+                                Apply Stock Adjustment
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Adjustment Audit Log Table (7 Cols) -->
+                <div class="lg:col-span-7 app-card overflow-hidden">
+                    <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Adjustment Audit Trail</h3>
+                            <p class="text-xs text-slate-500">History of stock corrections and write-offs</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="app-table text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Medicine</th>
+                                    <th>Batch</th>
+                                    <th>Type</th>
+                                    <th class="text-right">Qty</th>
+                                    <th>Reason</th>
+                                    <th>Adjusted By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adjustment-history-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let medicines = [];
+        let selectedMed = null;
+        let selectedBatch = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('inventory', 'Stock Adjustment', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Inventory', path: 'inventory/index.html' },
+                { label: 'Stock Adjustment', path: 'inventory/stock-adjustment.html' }
+            ]);
+
+            medicines = MHP_DB.getMedicines();
+            populateMedicinesDropdown();
+
+            // Check if passed via query params (e.g. ?med=9&batch=ATO24Old)
+            const paramMed = Utils.getUrlParam('med');
+            const paramBatch = Utils.getUrlParam('batch');
+            if (paramMed) {
+                document.getElementById('adj-medicine').value = paramMed;
+                onMedicineSelect(paramMed);
+                if (paramBatch) {
+                    document.getElementById('adj-batch').value = paramBatch;
+                    onBatchSelect();
+                }
+            } else if (medicines.length) {
+                onMedicineSelect(medicines[0].id);
+            }
+
+            renderAdjustmentHistory();
+        });
+
+        function populateMedicinesDropdown() {
+            const select = document.getElementById('adj-medicine');
+            select.innerHTML = medicines.map(m => `
+                <option value="${m.id}">${m.name} (${m.category})</option>
+            `).join('');
+        }
+
+        function onMedicineSelect(medId) {
+            selectedMed = medicines.find(m => Number(m.id) === Number(medId));
+            const batchSelect = document.getElementById('adj-batch');
+
+            if (!selectedMed || !selectedMed.batches || !selectedMed.batches.length) {
+                batchSelect.innerHTML = `<option value="">No batches found</option>`;
+                selectedBatch = null;
+                document.getElementById('adj-current-stock').innerText = '0 units';
+                updateCalculationPreview();
+                return;
+            }
+
+            batchSelect.innerHTML = selectedMed.batches.map(b => `
+                <option value="${b.batchNo}">${b.batchNo} (Qty: ${b.quantity} | Exp: ${b.expiry})</option>
+            `).join('');
+
+            onBatchSelect();
+        }
+
+        function onBatchSelect() {
+            const batchNo = document.getElementById('adj-batch').value;
+            if (!selectedMed || !selectedMed.batches) return;
+            selectedBatch = selectedMed.batches.find(b => b.batchNo === batchNo);
+
+            const curQty = selectedBatch ? Number(selectedBatch.quantity) || 0 : 0;
+            document.getElementById('adj-current-stock').innerText = `${curQty} units`;
+            updateCalculationPreview();
+        }
+
+        function updateCalculationPreview() {
+            const curQty = selectedBatch ? Number(selectedBatch.quantity) || 0 : 0;
+            const type = document.getElementById('adj-type').value;
+            const delta = Number(document.getElementById('adj-qty').value) || 0;
+
+            let newQty = curQty;
+            if (["Damage", "Expired", "Missing"].includes(type)) {
+                newQty = Math.max(0, curQty - delta);
+            } else if (type === "Return") {
+                newQty = curQty + delta;
+            } else if (type === "Manual Correction") {
+                newQty = delta; // User sets exact new count
+            }
+
+            document.getElementById('adj-preview-new-stock').innerText = `${newQty} units (${newQty - curQty >= 0 ? '+' : ''}${newQty - curQty})`;
+        }
+
+        function handleSaveAdjustment(e) {
+            e.preventDefault();
+            if (!selectedMed || !selectedBatch) {
+                showToast('Please select a valid medicine and batch', 'error');
+                return;
+            }
+
+            const type = document.getElementById('adj-type').value;
+            const qty = Number(document.getElementById('adj-qty').value) || 1;
+            const reason = document.getElementById('adj-reason').value.trim();
+            const notes = document.getElementById('adj-notes').value.trim();
+
+            const adj = {
+                medicineId: selectedMed.id,
+                medicineName: selectedMed.name,
+                batchNo: selectedBatch.batchNo,
+                adjustmentType: type,
+                quantity: qty,
+                reason,
+                notes,
+                adjustedBy: APP_CONFIG.demoAuth.displayName
+            };
+
+            MHP_DB.saveAdjustment(adj);
+            showToast('Stock adjustment applied and verified successfully!', 'success');
+
+            // Refresh medicines
+            medicines = MHP_DB.getMedicines();
+            onMedicineSelect(selectedMed.id);
+            renderAdjustmentHistory();
+        }
+
+        function renderAdjustmentHistory() {
+            const tbody = document.getElementById('adjustment-history-tbody');
+            const history = MHP_DB.getAdjustments();
+
+            if (!history.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">No adjustments recorded</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = history.map(h => {
+                let badgeClass = 'badge-neutral';
+                if (['Damage', 'Expired', 'Missing'].includes(h.adjustmentType)) badgeClass = 'badge-danger';
+                else if (h.adjustmentType === 'Return') badgeClass = 'badge-success';
+                else badgeClass = 'badge-info';
+
+                return `
+                    <tr>
+                        <td class="text-slate-500 whitespace-nowrap">${Utils.formatDate(h.date)}</td>
+                        <td class="font-bold text-slate-900">${h.medicineName}</td>
+                        <td class="font-mono text-slate-700">${h.batchNo}</td>
+                        <td><span class="badge ${badgeClass}">${h.adjustmentType}</span></td>
+                        <td class="text-right font-bold text-slate-900">${h.quantity}</td>
+                        <td class="text-slate-600 truncate max-w-[140px]">${h.reason}</td>
+                        <td class="text-slate-500">${h.adjustedBy || 'Pharmacist'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

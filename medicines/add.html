@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Medicine — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Add New Medicine</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Register a new pharmaceutical product into the master inventory</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Cancel</a>
+                    <button type="submit" form="medicine-form" class="btn-primary text-xs py-2 px-4 shadow-sm">
+                        <span>Save Medicine</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add Medicine Master Form -->
+            <form id="medicine-form" onsubmit="handleSaveMedicine(event)" class="space-y-6 max-w-5xl">
+                
+                <!-- Section 1: Basic Information -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">1</span>
+                            <span>Basic Product Information</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        
+                        <div class="lg:col-span-2">
+                            <label class="form-label" for="med-name">Medicine Name <span class="text-rose-500">*</span></label>
+                            <input type="text" id="med-name" required placeholder="e.g. Paracetamol 500mg" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-brand">Trade / Brand Name</label>
+                            <input type="text" id="med-brand" placeholder="e.g. Crocin Advance / Calpol" class="form-input text-sm">
+                        </div>
+
+                        <div class="lg:col-span-2">
+                            <label class="form-label" for="med-generic">Generic Name / Active Salt <span class="text-rose-500">*</span></label>
+                            <input type="text" id="med-generic" required placeholder="e.g. Paracetamol / Acetaminophen" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-manufacturer">Manufacturer / Pharma Company</label>
+                            <input type="text" id="med-manufacturer" placeholder="e.g. Cipla Ltd / Sun Pharma" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-category">Category <span class="text-rose-500">*</span></label>
+                            <select id="med-category" required class="form-select text-sm">
+                                <option value="Tablet">Tablet</option>
+                                <option value="Capsule">Capsule</option>
+                                <option value="Syrup / Liquid">Syrup / Liquid</option>
+                                <option value="Powder / Sachet">Powder / Sachet</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Ointment / Gel">Ointment / Gel</option>
+                                <option value="Inhaler">Inhaler</option>
+                                <option value="Eye / Ear Drops">Eye / Ear Drops</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-strength">Dosage &amp; Strength</label>
+                            <input type="text" id="med-strength" placeholder="e.g. 500 mg / 10 ml" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-pack">Pack Size</label>
+                            <input type="text" id="med-pack" placeholder="e.g. 10 Tablets / Strip" class="form-input text-sm">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 2: Commercial & Tax Pricing -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">2</span>
+                            <span>Commercial &amp; Tax Pricing</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        
+                        <div>
+                            <label class="form-label" for="med-purchase">Purchase Rate (₹)</label>
+                            <input type="number" step="0.01" id="med-purchase" required placeholder="0.00" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-mrp">Maximum Retail Price (₹)</label>
+                            <input type="number" step="0.01" id="med-mrp" required placeholder="0.00" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-selling">Selling Price (₹)</label>
+                            <input type="number" step="0.01" id="med-selling" required placeholder="0.00" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-discount">Default Discount (%)</label>
+                            <input type="number" step="0.5" id="med-discount" value="0" min="0" max="100" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-gst">GST Slab (%)</label>
+                            <select id="med-gst" class="form-select text-sm">
+                                <option value="0">0% (Nil)</option>
+                                <option value="5">5% GST</option>
+                                <option value="12" selected>12% GST (Medicines)</option>
+                                <option value="18">18% GST</option>
+                                <option value="28">28% GST</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-hsn">HSN Code</label>
+                            <input type="text" id="med-hsn" value="30049099" class="form-input text-sm font-mono">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 3: Inventory Thresholds & Storage -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">3</span>
+                            <span>Inventory Thresholds &amp; Storage Location</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        
+                        <div>
+                            <label class="form-label" for="med-min-stock">Minimum Safety Stock</label>
+                            <input type="number" id="med-min-stock" value="15" min="1" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-reorder">Reorder Trigger Level</label>
+                            <input type="number" id="med-reorder" value="30" min="1" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-max-stock">Maximum Stock Capacity</label>
+                            <input type="number" id="med-max-stock" value="500" min="1" class="form-input text-sm">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-rack">Rack / Bin Location</label>
+                            <input type="text" id="med-rack" placeholder="e.g. A-12-04" class="form-input text-sm font-mono">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 4: Identification & Compliance -->
+                <div class="app-card p-5 md:p-6 space-y-4">
+                    <div class="border-b border-appborder pb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-primary-light text-primary flex items-center justify-center text-xs font-bold">4</span>
+                            <span>Identification &amp; Statutory Compliance</span>
+                        </h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        
+                        <div>
+                            <label class="form-label" for="med-code">Medicine Code</label>
+                            <input type="text" id="med-code" readonly class="form-input text-sm font-mono bg-slate-50 cursor-not-allowed">
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-barcode">Barcode / EAN</label>
+                            <div class="flex gap-1.5">
+                                <input type="text" id="med-barcode" placeholder="Scan or enter" class="form-input text-sm font-mono">
+                                <button type="button" onclick="generateBarcode()" class="btn-secondary text-xs px-2.5" title="Generate Barcode">Gen</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-prescription">Prescription Required?</label>
+                            <select id="med-prescription" class="form-select text-sm">
+                                <option value="false">No (Over-The-Counter OTC)</option>
+                                <option value="true">Yes (Rx Required)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label" for="med-schedule">Drug Schedule</label>
+                            <select id="med-schedule" class="form-select text-sm">
+                                <option value="General (OTC)">General (OTC)</option>
+                                <option value="Schedule H">Schedule H (Prescription)</option>
+                                <option value="Schedule H1">Schedule H1 (High Risk / Antibiotic)</option>
+                                <option value="Schedule X">Schedule X (Narcotic / Sedative)</option>
+                                <option value="Schedule G">Schedule G</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-appborder">
+                    <a href="index.html" class="btn-secondary text-sm">Cancel</a>
+                    <button type="button" onclick="handleSaveAndAddAnother(event)" class="btn-secondary text-sm">
+                        Save &amp; Add Another
+                    </button>
+                    <button type="submit" class="btn-primary text-sm shadow-md">
+                        Save Medicine to Formulary
+                    </button>
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('medicines', 'Add New Medicine', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Medicines', path: 'medicines/index.html' },
+                { label: 'Add Medicine', path: 'medicines/add.html' }
+            ]);
+
+            // Auto-generate next medicine code
+            const meds = MHP_DB.getMedicines();
+            const nextCode = 'MED-' + String(meds.length + 1).padStart(4, '0');
+            document.getElementById('med-code').value = nextCode;
+
+            // Generate default barcode
+            generateBarcode();
+        });
+
+        function generateBarcode() {
+            const randomBarcode = '890' + Math.floor(1000000000 + Math.random() * 9000000000);
+            document.getElementById('med-barcode').value = randomBarcode;
+        }
+
+        function extractFormData() {
+            return {
+                name: document.getElementById('med-name').value.trim(),
+                brand: document.getElementById('med-brand').value.trim(),
+                genericName: document.getElementById('med-generic').value.trim(),
+                manufacturer: document.getElementById('med-manufacturer').value.trim() || 'Generic Healthcare Ltd',
+                category: document.getElementById('med-category').value,
+                strength: document.getElementById('med-strength').value.trim(),
+                packSize: document.getElementById('med-pack').value.trim() || '10 Tablets',
+                purchasePrice: Number(document.getElementById('med-purchase').value) || 0,
+                mrp: Number(document.getElementById('med-mrp').value) || 0,
+                sellingPrice: Number(document.getElementById('med-selling').value) || 0,
+                discount: Number(document.getElementById('med-discount').value) || 0,
+                gst: Number(document.getElementById('med-gst').value) || 12,
+                hsn: document.getElementById('med-hsn').value.trim() || '30049099',
+                minStock: Number(document.getElementById('med-min-stock').value) || 15,
+                reorderLevel: Number(document.getElementById('med-reorder').value) || 30,
+                maxStock: Number(document.getElementById('med-max-stock').value) || 500,
+                rackNumber: document.getElementById('med-rack').value.trim() || 'A-01',
+                medicineCode: document.getElementById('med-code').value,
+                barcode: document.getElementById('med-barcode').value.trim(),
+                prescriptionRequired: document.getElementById('med-prescription').value === 'true',
+                scheduleType: document.getElementById('med-schedule').value,
+                status: 'active',
+                batches: []
+            };
+        }
+
+        function handleSaveMedicine(e) {
+            e.preventDefault();
+            const data = extractFormData();
+            MHP_DB.saveMedicine(data);
+            showToast(`${data.name} saved successfully!`, 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+
+        function handleSaveAndAddAnother(e) {
+            e.preventDefault();
+            const form = document.getElementById('medicine-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            const data = extractFormData();
+            MHP_DB.saveMedicine(data);
+            showToast(`${data.name} saved! Enter next medicine.`, 'success');
+            form.reset();
+            const meds = MHP_DB.getMedicines();
+            document.getElementById('med-code').value = 'MED-' + String(meds.length + 1).padStart(4, '0');
+            generateBarcode();
+            document.getElementById('med-name').focus();
+        }
+    </script>
+</body>
+</html>

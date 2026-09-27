@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for high-fidelity ERP analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/css/themes.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Dashboard Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Welcome Header & Quick Action Buttons -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight" id="greeting-title">Good Morning, Admin</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5 flex items-center gap-2">
+                        <span id="current-date-display">Today</span>
+                        <span>•</span>
+                        <span class="text-teal-700 font-medium">Main Store Counter Active</span>
+                    </p>
+                </div>
+                <!-- Quick Actions Strip -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <a href="billing/index.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6"/><path d="M16 12h-6"/><path d="M14 16h-4"/></svg>
+                        <span>New Bill (F2)</span>
+                    </a>
+                    <a href="medicines/add.html" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Add Medicine</span>
+                    </a>
+                    <a href="purchases/create.html" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M19 18h2a1 1 0 0 0 1-1v-5.28a2 2 0 0 0-.8-1.6L18 8h-4"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                        <span>New Purchase</span>
+                    </a>
+                    <a href="customers/add.html" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+                        <span>Add Customer</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Cards Grid (4 Primary Cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Card 1: Today's Sales -->
+                <div class="app-card p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Today's Sales</span>
+                        <span class="p-2 rounded-lg bg-teal-50 text-teal-700">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900" id="kpi-sales">₹42,580</div>
+                    <div class="flex items-center gap-1.5 mt-2 text-xs">
+                        <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>
+                            +12.5%
+                        </span>
+                        <span class="text-slate-400">vs yesterday (₹37,840)</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Today's Purchase -->
+                <div class="app-card p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Today's Purchase</span>
+                        <span class="p-2 rounded-lg bg-blue-50 text-blue-700">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900" id="kpi-purchase">₹18,420</div>
+                    <div class="flex items-center gap-1.5 mt-2 text-xs">
+                        <span class="text-slate-600 font-medium">3 Vendor Invoices Received</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Stock Value -->
+                <div class="app-card p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Total Stock Value</span>
+                        <span class="p-2 rounded-lg bg-indigo-50 text-indigo-700">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900" id="kpi-stock">₹8,42,650</div>
+                    <div class="flex items-center gap-1.5 mt-2 text-xs">
+                        <span class="text-slate-500">Across 24 Active Batches</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Outstanding Receivables -->
+                <div class="app-card p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Outstanding Dues</span>
+                        <span class="p-2 rounded-lg bg-amber-50 text-amber-700">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900" id="kpi-outstanding">₹32,850</div>
+                    <div class="flex items-center gap-1.5 mt-2 text-xs">
+                        <span class="text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded">₹14,200 due to Apollo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Analytic Row: Sales Chart + Quick Insights Panel -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Sales Overview Chart (8 Cols) -->
+                <div class="lg:col-span-8 app-card p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Sales Overview</h3>
+                            <p class="text-xs text-slate-500">Revenue trends across pharmacy sales counters</p>
+                        </div>
+                        <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs">
+                            <button onclick="updateChartFilter('today', this)" class="chart-tab px-3 py-1 font-semibold rounded-md text-slate-600 hover:text-slate-900">Today</button>
+                            <button onclick="updateChartFilter('7days', this)" class="chart-tab px-3 py-1 font-semibold rounded-md bg-white text-primary shadow-xs">7 Days</button>
+                            <button onclick="updateChartFilter('30days', this)" class="chart-tab px-3 py-1 font-semibold rounded-md text-slate-600 hover:text-slate-900">30 Days</button>
+                            <button onclick="updateChartFilter('year', this)" class="chart-tab px-3 py-1 font-semibold rounded-md text-slate-600 hover:text-slate-900">This Year</button>
+                        </div>
+                    </div>
+                    <div class="h-64 sm:h-72 w-full">
+                        <canvas id="salesOverviewChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Insights & Operational Alerts (4 Cols) -->
+                <div class="lg:col-span-4 space-y-3">
+                    
+                    <div class="app-card p-4 flex items-center justify-between border-l-4 border-amber-500">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-amber-50 text-amber-600 rounded-lg">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Low Stock</h4>
+                                <p class="text-xs text-slate-500">12 Medicines under reorder</p>
+                            </div>
+                        </div>
+                        <a href="inventory/low-stock.html" class="text-xs font-semibold text-primary hover:underline">View Stock &rarr;</a>
+                    </div>
+
+                    <div class="app-card p-4 flex items-center justify-between border-l-4 border-rose-500">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-rose-50 text-rose-600 rounded-lg">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Expiring Soon</h4>
+                                <p class="text-xs text-slate-500">8 Batches within 90 days</p>
+                            </div>
+                        </div>
+                        <a href="inventory/expiry.html" class="text-xs font-semibold text-rose-600 hover:underline">View Expiry &rarr;</a>
+                    </div>
+
+                    <div class="app-card p-4 flex items-center justify-between border-l-4 border-slate-400">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-slate-100 text-slate-600 rounded-lg">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><line x1="4.5" x2="19.5" y1="9" y2="9"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Out of Stock</h4>
+                                <p class="text-xs text-slate-500">5 Essential items depleted</p>
+                            </div>
+                        </div>
+                        <a href="inventory/index.html" class="text-xs font-semibold text-slate-700 hover:underline">View Inventory &rarr;</a>
+                    </div>
+
+                    <div class="app-card p-4 flex items-center justify-between border-l-4 border-blue-500">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Pending Payments</h4>
+                                <p class="text-xs text-slate-500">₹32,850 receivables</p>
+                            </div>
+                        </div>
+                        <a href="customers/index.html" class="text-xs font-semibold text-blue-600 hover:underline">View Customers &rarr;</a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Two Data Tables: Recent Sales & Top Selling Medicines -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Recent Sales Table (7 Cols) -->
+                <div class="lg:col-span-7 app-card overflow-hidden">
+                    <div class="p-4 border-b border-appborder flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">Recent Counter Sales</h3>
+                            <p class="text-xs text-slate-500">Latest completed point-of-sale invoices</p>
+                        </div>
+                        <a href="billing/index.html" class="text-xs font-semibold text-primary hover:underline">Open POS &rarr;</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="app-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-sales-tbody">
+                                <!-- Populated dynamically by script -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Selling Medicines (5 Cols) -->
+                <div class="lg:col-span-5 app-card overflow-hidden">
+                    <div class="p-4 border-b border-appborder flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">Top Selling Medicines</h3>
+                            <p class="text-xs text-slate-500">High volume fast-moving drugs</p>
+                        </div>
+                        <a href="reports/sales.html" class="text-xs font-semibold text-primary hover:underline">Full Report &rarr;</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="app-table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Category</th>
+                                    <th class="text-right">Sold</th>
+                                    <th class="text-right">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-medicines-tbody">
+                                <!-- Populated dynamically by script -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        let salesChart = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Master Layout
+            Components.initLayout('dashboard', 'Dashboard', [{ label: 'Dashboard', path: 'dashboard.html' }]);
+
+            // Set greeting based on time of day
+            const hour = new Date().getHours();
+            let greeting = 'Good Morning';
+            if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+            else if (hour >= 17) greeting = 'Good Evening';
+            document.getElementById('greeting-title').innerText = `${greeting}, Admin`;
+
+            // Display today's formatted date
+            document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            // Populate Recent Sales Table
+            renderRecentSales();
+
+            // Populate Top Selling Medicines
+            renderTopMedicines();
+
+            // Initialize Sales Chart
+            initSalesChart();
+        });
+
+        function renderRecentSales() {
+            const tbody = document.getElementById('recent-sales-tbody');
+            const sales = MHP_DB.getSales().slice(0, 5);
+
+            if (!sales.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">No transactions recorded yet</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sales.map(s => `
+                <tr>
+                    <td class="font-bold text-slate-900">${s.invoiceNo}</td>
+                    <td>
+                        <span class="font-medium text-slate-800">${s.customerName}</span>
+                    </td>
+                    <td class="font-bold text-slate-900">${Utils.formatINR(s.grandTotal)}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${s.paymentMethod}</span></td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(s.date)}</td>
+                    <td>${Components.renderStatusBadge(s.paymentStatus || 'Paid')}</td>
+                    <td class="text-right">
+                        <a href="billing/invoice.html?id=${s.invoiceNo}" class="btn-secondary text-xs py-1 px-2.5">
+                            Print
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTopMedicines() {
+            const tbody = document.getElementById('top-medicines-tbody');
+            const topMeds = [
+                { name: "Paracetamol 500mg", cat: "Tablet", sold: 340, rev: 10200 },
+                { name: "Augmentin 625 Duo", cat: "Tablet", sold: 85, rev: 16575 },
+                { name: "Pan 40 Gastro-Resistant", cat: "Tablet", sold: 95, rev: 13775 },
+                { name: "Azee 500 (Azithromycin)", cat: "Tablet", sold: 70, rev: 7700 },
+                { name: "Electral ORS 21.8g", cat: "Powder", sold: 180, rev: 3960 }
+            ];
+
+            tbody.innerHTML = topMeds.map(m => `
+                <tr>
+                    <td>
+                        <div class="font-semibold text-slate-900 text-xs">${m.name}</div>
+                    </td>
+                    <td><span class="text-[11px] text-slate-500">${m.cat}</span></td>
+                    <td class="text-right font-medium text-slate-700 text-xs">${m.sold}</td>
+                    <td class="text-right font-bold text-slate-900 text-xs">${Utils.formatINR(m.rev)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function initSalesChart() {
+            const ctx = document.getElementById('salesOverviewChart').getContext('2d');
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#0f766e';
+
+            const data7Days = {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+                datasets: [
+                    {
+                        label: 'Sales (₹)',
+                        data: [32000, 28500, 39400, 34200, 48200, 52100, 42580],
+                        borderColor: primaryColor,
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: primaryColor
+                    },
+                    {
+                        label: 'Purchases (₹)',
+                        data: [15000, 12000, 18000, 14000, 24000, 16000, 18420],
+                        borderColor: '#94a3b8',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.35,
+                        pointRadius: 3
+                    }
+                ]
+            };
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: data7Days,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { boxWidth: 12, font: { size: 11, family: 'Inter' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.dataset.label}: ${Utils.formatINR(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (v) => '₹' + (v / 1000) + 'k',
+                                font: { size: 10 }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Re-render chart on theme change
+            window.addEventListener('mhp:themechanged', () => {
+                if (salesChart) {
+                    const newPrimary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+                    salesChart.data.datasets[0].borderColor = newPrimary;
+                    salesChart.data.datasets[0].pointBackgroundColor = newPrimary;
+                    salesChart.update();
+                }
+            });
+        }
+
+        function updateChartFilter(period, btn) {
+            document.querySelectorAll('.chart-tab').forEach(b => {
+                b.classList.remove('bg-white', 'text-primary', 'shadow-xs');
+                b.classList.add('text-slate-600');
+            });
+            btn.classList.add('bg-white', 'text-primary', 'shadow-xs');
+            btn.classList.remove('text-slate-600');
+
+            if (!salesChart) return;
+
+            if (period === 'today') {
+                salesChart.data.labels = ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM', 'Now'];
+                salesChart.data.datasets[0].data = [4200, 8900, 14200, 21500, 29000, 37400, 42580];
+                salesChart.data.datasets[1].data = [0, 4500, 4500, 12000, 12000, 18420, 18420];
+            } else if (period === '7days') {
+                salesChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
+                salesChart.data.datasets[0].data = [32000, 28500, 39400, 34200, 48200, 52100, 42580];
+                salesChart.data.datasets[1].data = [15000, 12000, 18000, 14000, 24000, 16000, 18420];
+            } else if (period === '30days') {
+                salesChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                salesChart.data.datasets[0].data = [240000, 285000, 310000, 295000];
+                salesChart.data.datasets[1].data = [120000, 140000, 160000, 135000];
+            } else if (period === 'year') {
+                salesChart.data.labels = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
+                salesChart.data.datasets[0].data = [980000, 1120000, 1080000, 1250000, 1310000, 1130000];
+                salesChart.data.datasets[1].data = [540000, 620000, 590000, 680000, 710000, 620000];
+            }
+            salesChart.update();
+        }
+    </script>
+</body>
+</html>

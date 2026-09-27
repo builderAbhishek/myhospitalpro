@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers &amp; Distributors — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Suppliers &amp; Distributors</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">Pharmaceutical distributors, C&amp;F agencies, and vendor payment ledgers</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportSuppliers()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <a href="add.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Add Supplier</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards Strip -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Suppliers</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-total-supp">0</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Authorized stockists</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Active Suppliers</span>
+                    <div class="text-2xl font-extrabold text-emerald-700" id="stat-active-supp">0</div>
+                    <span class="text-xs text-emerald-600 font-medium mt-1 block">Active trade partners</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Outstanding Due</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="stat-supp-outstanding">₹0.00</div>
+                    <span class="text-xs text-amber-700 font-medium mt-1 block">Vendor payables balance</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">This Month Purchases</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-month-pur">₹61,096</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Inward consignments</span>
+                </div>
+            </div>
+
+            <!-- Table Card with Search & Filters -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-sm">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="Search distributor, contact, GSTIN..." class="form-input pl-9 text-xs sm:text-sm">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Supplier / Distributor</th>
+                                <th>Contact Person &amp; Phone</th>
+                                <th>GSTIN &amp; Drug License</th>
+                                <th class="text-right">Total Purchases</th>
+                                <th class="text-right">Outstanding Due</th>
+                                <th>Payment Terms</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliers-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="suppliers-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let allSuppliers = [];
+        let filteredSuppliers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('suppliers', 'Distributors & Suppliers', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Suppliers', path: 'suppliers/index.html' }
+            ]);
+
+            loadSuppliers();
+        });
+
+        function loadSuppliers() {
+            allSuppliers = MHP_DB.getSuppliers();
+            filteredSuppliers = [...allSuppliers];
+
+            const total = allSuppliers.length;
+            const active = allSuppliers.filter(s => s.status === 'active').length;
+            const due = allSuppliers.reduce((acc, s) => acc + (Number(s.outstandingBalance) || 0), 0);
+
+            document.getElementById('stat-total-supp').innerText = total;
+            document.getElementById('stat-active-supp').innerText = active;
+            document.getElementById('stat-supp-outstanding').innerText = Utils.formatINR(due);
+
+            renderTable();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+
+            filteredSuppliers = allSuppliers.filter(s => {
+                return !query ||
+                    s.name.toLowerCase().includes(query) ||
+                    (s.contactPerson && s.contactPerson.toLowerCase().includes(query)) ||
+                    (s.phone && s.phone.includes(query)) ||
+                    (s.gstin && s.gstin.toLowerCase().includes(query));
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('suppliers-tbody');
+            const empty = document.getElementById('suppliers-empty');
+
+            if (!filteredSuppliers.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'building-2',
+                    'No suppliers found',
+                    'No distributor agencies match your current search query.',
+                    `<a href="add.html" class="btn-primary text-xs py-2 px-3.5">Add Supplier</a>`
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredSuppliers.map(s => `
+                <tr>
+                    <td>
+                        <a href="view.html?id=${s.id}" class="font-bold text-slate-900 hover:text-primary transition-colors block text-sm">
+                            ${s.name}
+                        </a>
+                        <span class="text-xs text-slate-500">${s.city || 'Delhi'} • ${s.company || ''}</span>
+                    </td>
+                    <td>
+                        <span class="font-medium text-slate-800 text-xs block">${s.contactPerson}</span>
+                        <span class="text-xs font-mono text-slate-500">${s.phone}</span>
+                    </td>
+                    <td>
+                        <span class="font-mono text-xs text-slate-700 block">${s.gstin}</span>
+                        <span class="text-[11px] text-slate-400 font-mono">${s.drugLicence}</span>
+                    </td>
+                    <td class="text-right font-medium text-slate-800">${Utils.formatINR(s.totalPurchases || 0)}</td>
+                    <td class="text-right font-bold ${Number(s.outstandingBalance) > 0 ? 'text-amber-600' : 'text-slate-400'}">
+                        ${Utils.formatINR(s.outstandingBalance || 0)}
+                    </td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${s.paymentTerms}</span></td>
+                    <td>${Components.renderStatusBadge(s.status || 'Active')}</td>
+                    <td class="text-right">
+                        <a href="view.html?id=${s.id}" class="btn-secondary text-xs py-1 px-2.5">
+                            View Ledger
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportSuppliers() {
+            const rows = filteredSuppliers.map(s => ({
+                Supplier: s.name,
+                Company: s.company || '',
+                ContactPerson: s.contactPerson,
+                Phone: s.phone,
+                Email: s.email || '',
+                GSTIN: s.gstin,
+                DrugLicence: s.drugLicence,
+                PaymentTerms: s.paymentTerms,
+                TotalPurchases: s.totalPurchases,
+                OutstandingDue: s.outstandingBalance
+            }));
+            Utils.exportToCSV('MHP-Suppliers-Directory', rows);
+        }
+    </script>
+</body>
+</html>

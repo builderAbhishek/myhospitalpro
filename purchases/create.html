@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Purchase Bill — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Record Inward Purchase Bill</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Enter vendor consignment details to update stock and vendor ledger</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Cancel</a>
+                    <button type="button" onclick="handleSavePurchase()" class="btn-primary text-xs py-2 px-4 shadow-sm">
+                        <span>Save &amp; Inward Stock</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vendor & Invoice Metadata Card -->
+            <div class="app-card p-5">
+                <h3 class="text-sm font-bold text-slate-900 pb-2 mb-3 border-b border-appborder">Consignment &amp; Vendor Information</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div>
+                        <label class="form-label" for="pur-supplier">Select Supplier / Distributor *</label>
+                        <select id="pur-supplier" required class="form-select text-xs">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label" for="pur-invoice-no">Vendor Invoice Number *</label>
+                        <input type="text" id="pur-invoice-no" required placeholder="e.g. PUR-2026-0920" class="form-input text-xs font-mono uppercase">
+                    </div>
+                    <div>
+                        <label class="form-label" for="pur-date">Invoice Date *</label>
+                        <input type="date" id="pur-date" required class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="pur-payment-type">Payment Type</label>
+                        <select id="pur-payment-type" class="form-select text-xs">
+                            <option value="Credit">Credit (Pay Later)</option>
+                            <option value="Bank Transfer / NEFT">Bank Transfer / NEFT</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI / Digital</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Medicine Entry Table -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Purchased Medicine Items</h3>
+                        <p class="text-xs text-slate-500">Add batch numbers and quantity received for automatic stock entry</p>
+                    </div>
+                    <button type="button" onclick="addPurchaseRow()" class="btn-primary text-xs py-1.5 px-3">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Add Medicine Row</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="app-table text-xs">
+                        <thead>
+                            <tr>
+                                <th class="w-64">Medicine Product *</th>
+                                <th class="w-28">Batch No *</th>
+                                <th class="w-32">Expiry Date *</th>
+                                <th class="w-20 text-right">Qty *</th>
+                                <th class="w-20 text-right">Free Qty</th>
+                                <th class="w-28 text-right">Purchase Rate (₹)</th>
+                                <th class="w-28 text-right">MRP (₹)</th>
+                                <th class="w-20 text-right">GST %</th>
+                                <th class="w-20 text-right">Disc %</th>
+                                <th class="w-28 text-right">Total (₹)</th>
+                                <th class="w-12 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchase-items-tbody">
+                            <!-- Populated with dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Financial Calculation & Due Summary Box -->
+                <div class="p-6 bg-slate-50/70 border-t border-appborder grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 space-y-3">
+                        <label class="form-label">Consignment Remarks / Transport Memo</label>
+                        <textarea id="pur-notes" rows="3" placeholder="Enter transport LR number, delivery agent or invoice notes..." class="form-textarea text-xs"></textarea>
+                        <div class="p-3 bg-teal-50 border border-teal-100 rounded-lg text-xs text-teal-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-teal-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            <span>Saved items will automatically create or increase stock in the master inventory batches.</span>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-2 text-xs">
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Subtotal:</span>
+                            <span class="font-bold text-slate-800" id="calc-subtotal">₹0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Total Discount:</span>
+                            <span class="font-bold text-rose-600" id="calc-discount">- ₹0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>GST Amount:</span>
+                            <span class="font-bold text-slate-800" id="calc-gst">+ ₹0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 py-1">
+                            <span>Round Off:</span>
+                            <span class="font-mono text-slate-500" id="calc-roundoff">₹0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-300">
+                            <span>Grand Total:</span>
+                            <span class="text-teal-700" id="calc-grandtotal">₹0.00</span>
+                        </div>
+
+                        <!-- Paid & Due Amounts -->
+                        <div class="pt-3 border-t border-dashed border-slate-300 grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="form-label">Amount Paid (₹)</label>
+                                <input type="number" step="0.01" id="pur-paid-amount" oninput="calculateTotals()" value="0" min="0" class="form-input text-xs font-bold">
+                            </div>
+                            <div>
+                                <label class="form-label">Balance Due (₹)</label>
+                                <input type="text" id="pur-due-amount" readonly value="₹0.00" class="form-input text-xs font-bold text-amber-700 bg-amber-50/50 cursor-not-allowed">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-surface border-t border-appborder flex items-center justify-end gap-3">
+                    <a href="index.html" class="btn-secondary text-xs">Cancel</a>
+                    <button type="button" onclick="handleSavePurchase()" class="btn-primary text-xs shadow-md">
+                        Save Purchase &amp; Update Stock
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let medicinesList = [];
+        let rowCount = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('purchases', 'New Purchase Bill', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Purchases', path: 'purchases/index.html' },
+                { label: 'New Purchase', path: 'purchases/create.html' }
+            ]);
+
+            medicinesList = MHP_DB.getMedicines();
+            loadSuppliersDropdown();
+
+            // Set default date to today
+            document.getElementById('pur-date').value = Utils.getTodayISO();
+            document.getElementById('pur-invoice-no').value = Utils.generateId('PUR');
+
+            // Add first 2 empty entry rows
+            addPurchaseRow();
+            addPurchaseRow();
+        });
+
+        function loadSuppliersDropdown() {
+            const select = document.getElementById('pur-supplier');
+            const suppliers = MHP_DB.getSuppliers();
+            select.innerHTML = suppliers.map(s => `
+                <option value="${s.id}" data-name="${s.name}">
+                    ${s.name} (${s.city})
+                </option>
+            `).join('');
+        }
+
+        function addPurchaseRow() {
+            rowCount++;
+            const tbody = document.getElementById('purchase-items-tbody');
+            const tr = document.createElement('tr');
+            tr.id = `row-${rowCount}`;
+
+            const medOptions = medicinesList.map(m => `
+                <option value="${m.id}" data-rate="${m.purchasePrice}" data-mrp="${m.mrp}" data-gst="${m.gst}">
+                    ${m.name} (${m.packSize || ''})
+                </option>
+            `).join('');
+
+            tr.innerHTML = `
+                <td>
+                    <select class="form-select text-xs med-select" onchange="onMedicineChange(${rowCount}, this)">
+                        <option value="">-- Choose Medicine --</option>
+                        ${medOptions}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-input text-xs font-mono uppercase batch-input" placeholder="e.g. B26A">
+                </td>
+                <td>
+                    <input type="date" class="form-input text-xs exp-input">
+                </td>
+                <td>
+                    <input type="number" min="1" value="10" oninput="calculateTotals()" class="form-input text-xs text-right qty-input">
+                </td>
+                <td>
+                    <input type="number" min="0" value="0" oninput="calculateTotals()" class="form-input text-xs text-right free-input">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" value="0" oninput="calculateTotals()" class="form-input text-xs text-right rate-input">
+                </td>
+                <td>
+                    <input type="number" step="0.01" min="0" value="0" class="form-input text-xs text-right mrp-input">
+                </td>
+                <td>
+                    <input type="number" min="0" max="28" value="12" oninput="calculateTotals()" class="form-input text-xs text-right gst-input">
+                </td>
+                <td>
+                    <input type="number" min="0" max="100" value="0" oninput="calculateTotals()" class="form-input text-xs text-right disc-input">
+                </td>
+                <td class="text-right font-bold text-slate-800 row-total">
+                    ₹0.00
+                </td>
+                <td class="text-center">
+                    <button type="button" onclick="removePurchaseRow(${rowCount})" class="text-slate-400 hover:text-rose-600 p-1">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            // Auto-select first medicine on first row
+            if (rowCount === 1 && medicinesList.length) {
+                const sel = tr.querySelector('.med-select');
+                sel.value = medicinesList[0].id;
+                onMedicineChange(1, sel);
+            }
+        }
+
+        function removePurchaseRow(id) {
+            const tr = document.getElementById(`row-${id}`);
+            if (tr) {
+                tr.remove();
+                calculateTotals();
+            }
+        }
+
+        function onMedicineChange(rowId, selectElem) {
+            const medId = selectElem.value;
+            const med = medicinesList.find(m => Number(m.id) === Number(medId));
+            const tr = document.getElementById(`row-${rowId}`);
+            if (!tr) return;
+
+            if (med) {
+                tr.querySelector('.rate-input').value = med.purchasePrice || 0;
+                tr.querySelector('.mrp-input').value = med.mrp || 0;
+                tr.querySelector('.gst-input').value = med.gst || 12;
+                tr.querySelector('.batch-input').value = 'BATCH-' + Math.floor(100 + Math.random() * 900);
+
+                // Default expiry 18 months ahead
+                const future = new Date();
+                future.setMonth(future.getMonth() + 18);
+                tr.querySelector('.exp-input').value = future.toISOString().split('T')[0];
+            }
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            let totalDiscount = 0;
+            let totalGst = 0;
+
+            const rows = document.querySelectorAll('#purchase-items-tbody tr');
+            rows.forEach(tr => {
+                const qty = Number(tr.querySelector('.qty-input')?.value) || 0;
+                const rate = Number(tr.querySelector('.rate-input')?.value) || 0;
+                const gstRate = Number(tr.querySelector('.gst-input')?.value) || 0;
+                const discRate = Number(tr.querySelector('.disc-input')?.value) || 0;
+
+                const base = qty * rate;
+                const discAmount = base * (discRate / 100);
+                const taxable = base - discAmount;
+                const gstAmount = taxable * (gstRate / 100);
+                const rowTotal = taxable + gstAmount;
+
+                subtotal += base;
+                totalDiscount += discAmount;
+                totalGst += gstAmount;
+
+                const totalElem = tr.querySelector('.row-total');
+                if (totalElem) totalElem.innerText = Utils.formatINR(rowTotal);
+            });
+
+            const exactGrandTotal = subtotal - totalDiscount + totalGst;
+            const roundedGrandTotal = Math.round(exactGrandTotal);
+            const roundOff = roundedGrandTotal - exactGrandTotal;
+
+            document.getElementById('calc-subtotal').innerText = Utils.formatINR(subtotal);
+            document.getElementById('calc-discount').innerText = '- ' + Utils.formatINR(totalDiscount);
+            document.getElementById('calc-gst').innerText = '+ ' + Utils.formatINR(totalGst);
+            document.getElementById('calc-roundoff').innerText = Utils.formatINR(roundOff);
+            document.getElementById('calc-grandtotal').innerText = Utils.formatINR(roundedGrandTotal);
+
+            const paidInput = document.getElementById('pur-paid-amount');
+            let paid = Number(paidInput.value) || 0;
+            if (paid > roundedGrandTotal) {
+                paid = roundedGrandTotal;
+                paidInput.value = paid;
+            }
+            const due = Math.max(0, roundedGrandTotal - paid);
+            document.getElementById('pur-due-amount').value = Utils.formatINR(due);
+        }
+
+        function handleSavePurchase() {
+            const supplierSelect = document.getElementById('pur-supplier');
+            const supplierId = Number(supplierSelect.value);
+            const supplierName = supplierSelect.selectedOptions[0]?.dataset?.name || 'Selected Supplier';
+            const invoiceNo = document.getElementById('pur-invoice-no').value.trim();
+            const invoiceDate = document.getElementById('pur-date').value;
+            const paymentType = document.getElementById('pur-payment-type').value;
+
+            if (!invoiceNo) {
+                showToast('Please enter vendor invoice number', 'error');
+                return;
+            }
+
+            const items = [];
+            const rows = document.querySelectorAll('#purchase-items-tbody tr');
+
+            rows.forEach(tr => {
+                const medSelect = tr.querySelector('.med-select');
+                const medId = Number(medSelect?.value);
+                const batchNo = tr.querySelector('.batch-input')?.value.trim();
+                const expiry = tr.querySelector('.exp-input')?.value;
+                const qty = Number(tr.querySelector('.qty-input')?.value) || 0;
+                const free = Number(tr.querySelector('.free-input')?.value) || 0;
+                const rate = Number(tr.querySelector('.rate-input')?.value) || 0;
+                const mrp = Number(tr.querySelector('.mrp-input')?.value) || 0;
+                const gst = Number(tr.querySelector('.gst-input')?.value) || 0;
+                const discount = Number(tr.querySelector('.disc-input')?.value) || 0;
+
+                if (medId && batchNo && qty > 0) {
+                    const med = medicinesList.find(m => Number(m.id) === medId);
+                    items.push({
+                        medicineId: medId,
+                        name: med ? med.name : 'Medicine',
+                        batchNo,
+                        expiry: expiry || '2028-01-01',
+                        qty,
+                        free,
+                        rate,
+                        mrp,
+                        gst,
+                        discount,
+                        total: (qty * rate) - ((qty * rate) * (discount / 100)) + (((qty * rate) - ((qty * rate) * (discount / 100))) * (gst / 100))
+                    });
+                }
+            });
+
+            if (!items.length) {
+                showToast('Please add at least one valid medicine with batch & quantity', 'error');
+                return;
+            }
+
+            const subtotalText = document.getElementById('calc-subtotal').innerText.replace(/[^0-9.]/g, '');
+            const grandTotalText = document.getElementById('calc-grandtotal').innerText.replace(/[^0-9.]/g, '');
+            const paidAmount = Number(document.getElementById('pur-paid-amount').value) || 0;
+            const grandTotal = Number(grandTotalText) || 0;
+            const dueAmount = Math.max(0, grandTotal - paidAmount);
+
+            const purchase = {
+                invoiceNo,
+                supplierId,
+                supplierName,
+                invoiceDate,
+                paymentType,
+                paymentStatus: dueAmount === 0 ? 'Paid' : 'Pending',
+                itemsCount: items.length,
+                subtotal: Number(subtotalText) || 0,
+                discount: 0,
+                gst: 0,
+                roundOff: 0,
+                totalAmount: grandTotal,
+                paidAmount,
+                dueAmount,
+                items,
+                notes: document.getElementById('pur-notes').value.trim()
+            };
+
+            MHP_DB.savePurchase(purchase);
+            showToast('Purchase bill recorded and inventory stock updated!', 'success');
+            setTimeout(() => {
+                window.location.href = `view.html?id=${purchase.invoiceNo}`;
+            }, 600);
+        }
+    </script>
+</body>
+</html>

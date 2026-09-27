@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Master — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Inventory Control</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">Real-time physical batch balances, stock valuation, and alerts</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="low-stock.html" class="btn-secondary text-xs py-2 px-3 text-amber-700">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                        <span>Low Stock Alerts</span>
+                    </a>
+                    <a href="expiry.html" class="btn-secondary text-xs py-2 px-3 text-rose-600">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Expiry Monitor</span>
+                    </a>
+                    <a href="stock-adjustment.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                        <span>Stock Adjustment</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Inventory Summary Metric Cards (5 Cards) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Items</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-total-items">0</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Active drugs</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Stock Value</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-stock-value">₹0.00</div>
+                    <span class="text-[11px] text-teal-700 font-medium mt-1 block">At purchase cost</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Low Stock</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="stat-low-stock">0</div>
+                    <a href="low-stock.html" class="text-[11px] text-amber-700 hover:underline mt-1 block font-semibold">View items &rarr;</a>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Out of Stock</span>
+                    <div class="text-2xl font-extrabold text-rose-600" id="stat-out-stock">0</div>
+                    <span class="text-[11px] text-rose-700 mt-1 block font-medium">Critical replenishment</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Expiring Soon</span>
+                    <div class="text-2xl font-extrabold text-rose-600" id="stat-expiring">0</div>
+                    <a href="expiry.html" class="text-[11px] text-rose-700 hover:underline mt-1 block font-semibold">View batches &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Filters Strip & Table -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex-1 min-w-[240px] max-w-sm relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="Filter by medicine, batch #, rack..." class="form-input pl-9 text-xs sm:text-sm">
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="cat-filter" onchange="applyFilters()" class="form-select text-xs">
+                            <option value="">All Categories</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Capsule">Capsule</option>
+                            <option value="Syrup / Liquid">Syrup / Liquid</option>
+                            <option value="Powder / Sachet">Powder / Sachet</option>
+                        </select>
+                        <select id="status-filter" onchange="applyFilters()" class="form-select text-xs">
+                            <option value="">All Stock Status</option>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
+                        <button type="button" onclick="exportInventory()" class="btn-secondary text-xs py-1.5 px-3">
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine &amp; Rack</th>
+                                <th>Batch No</th>
+                                <th>Expiry</th>
+                                <th class="text-right">Physical Stock</th>
+                                <th>Dosage Unit</th>
+                                <th class="text-right">Purchase Rate</th>
+                                <th class="text-right">MRP</th>
+                                <th class="text-right">Stock Valuation</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="inventory-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let flatBatchList = [];
+        let filteredBatches = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('inventory', 'Inventory Master', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Inventory', path: 'inventory/index.html' }
+            ]);
+
+            loadInventory();
+        });
+
+        function loadInventory() {
+            const meds = MHP_DB.getMedicines();
+            flatBatchList = [];
+
+            let totalValue = 0;
+            let lowCount = 0;
+            let outCount = 0;
+            let expiringCount = 0;
+
+            meds.forEach(m => {
+                const totalStock = (m.batches || []).reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
+                const reorder = Number(m.reorderLevel) || 20;
+
+                if (totalStock === 0) outCount++;
+                else if (totalStock <= reorder) lowCount++;
+
+                if (!m.batches || !m.batches.length) {
+                    flatBatchList.push({
+                        medId: m.id,
+                        medName: m.name,
+                        brand: m.brand,
+                        category: m.category,
+                        rack: m.rackNumber || 'N/A',
+                        batchNo: 'NONE',
+                        expiry: '—',
+                        quantity: 0,
+                        unit: m.dosageForm || 'Units',
+                        purchaseRate: m.purchasePrice,
+                        mrp: m.mrp,
+                        stockVal: 0,
+                        status: 'Out of Stock'
+                    });
+                } else {
+                    m.batches.forEach(b => {
+                        const val = (Number(b.quantity) || 0) * (Number(b.purchaseRate) || Number(m.purchasePrice) || 0);
+                        totalValue += val;
+
+                        const expStatus = Utils.getExpiryStatus(b.expiry);
+                        if (['expired', '30days', '60days', '90days'].includes(expStatus.status)) {
+                            expiringCount++;
+                        }
+
+                        let status = 'In Stock';
+                        if (b.quantity === 0) status = 'Out of Stock';
+                        else if (totalStock <= reorder) status = 'Low Stock';
+
+                        flatBatchList.push({
+                            medId: m.id,
+                            medName: m.name,
+                            brand: m.brand,
+                            category: m.category,
+                            rack: m.rackNumber || 'N/A',
+                            batchNo: b.batchNo,
+                            expiry: b.expiry,
+                            quantity: b.quantity,
+                            unit: m.dosageForm || 'Units',
+                            purchaseRate: b.purchaseRate || m.purchasePrice,
+                            mrp: b.mrp || m.mrp,
+                            stockVal: val,
+                            status: status
+                        });
+                    });
+                }
+            });
+
+            document.getElementById('stat-total-items').innerText = meds.length;
+            document.getElementById('stat-stock-value').innerText = Utils.formatINR(totalValue);
+            document.getElementById('stat-low-stock').innerText = lowCount;
+            document.getElementById('stat-out-stock').innerText = outCount;
+            document.getElementById('stat-expiring').innerText = expiringCount;
+
+            filteredBatches = [...flatBatchList];
+            renderTable();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+            const cat = document.getElementById('cat-filter').value;
+            const status = document.getElementById('status-filter').value;
+
+            filteredBatches = flatBatchList.filter(item => {
+                const matchQ = !query || 
+                    item.medName.toLowerCase().includes(query) ||
+                    item.batchNo.toLowerCase().includes(query) ||
+                    item.rack.toLowerCase().includes(query);
+                const matchCat = !cat || item.category === cat;
+                const matchStatus = !status || item.status === status;
+                return matchQ && matchCat && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('inventory-tbody');
+            const empty = document.getElementById('inventory-empty');
+
+            if (!filteredBatches.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'boxes',
+                    'No inventory items found',
+                    'No stock batches match your current filter settings.'
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredBatches.map(item => {
+                let badgeClass = 'badge-success';
+                if (item.status === 'Out of Stock') badgeClass = 'badge-danger';
+                else if (item.status === 'Low Stock') badgeClass = 'badge-warning';
+
+                return `
+                    <tr>
+                        <td>
+                            <a href="../medicines/view.html?id=${item.medId}" class="font-bold text-slate-900 hover:text-primary transition-colors block text-sm">
+                                ${item.medName}
+                            </a>
+                            <span class="text-[11px] text-slate-500 font-mono">Rack: ${item.rack} • ${item.category}</span>
+                        </td>
+                        <td class="font-mono font-bold text-slate-800 text-xs">${item.batchNo}</td>
+                        <td class="text-xs text-slate-600">${Utils.formatDate(item.expiry)}</td>
+                        <td class="text-right font-extrabold ${item.quantity === 0 ? 'text-rose-600' : 'text-slate-900'}">${item.quantity}</td>
+                        <td class="text-xs text-slate-500">${item.unit}</td>
+                        <td class="text-right text-xs text-slate-600">${Utils.formatINR(item.purchaseRate)}</td>
+                        <td class="text-right text-xs text-slate-600">${Utils.formatINR(item.mrp)}</td>
+                        <td class="text-right font-bold text-slate-900">${Utils.formatINR(item.stockVal)}</td>
+                        <td><span class="badge ${badgeClass}">${item.status}</span></td>
+                        <td class="text-right">
+                            <a href="stock-adjustment.html" class="btn-secondary text-[11px] py-1 px-2.5">
+                                Adjust
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportInventory() {
+            const rows = filteredBatches.map(b => ({
+                Medicine: b.medName,
+                Category: b.category,
+                Rack: b.rack,
+                BatchNo: b.batchNo,
+                Expiry: b.expiry,
+                Quantity: b.quantity,
+                PurchaseRate: b.purchaseRate,
+                MRP: b.mrp,
+                StockValue: b.stockVal,
+                Status: b.status
+            }));
+            Utils.exportToCSV('MHP-Inventory-Valuation', rows);
+        }
+    </script>
+</body>
+</html>

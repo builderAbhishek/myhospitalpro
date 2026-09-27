@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Invoices — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Purchase Management</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">Vendor purchase bills, inward stock consignments, and payables</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportPurchases()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <a href="create.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>New Purchase Bill</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards Strip -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Purchases</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-total-purchases">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">All vendor consignments</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Pending Payables</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="stat-pending-payables">₹0.00</div>
+                    <span class="text-xs text-amber-700 mt-1 block">Vendor credit dues</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">This Month</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-month-purchases">₹61,096</div>
+                    <span class="text-xs text-emerald-600 font-medium mt-1 block">Current billing cycle</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Purchase Returns</span>
+                    <div class="text-2xl font-extrabold text-slate-900">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">0 debit notes recorded</span>
+                </div>
+            </div>
+
+            <!-- Filter Strip & Purchases Table Card -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="relative flex-1 max-w-sm">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="Filter by invoice no, distributor..." class="form-input pl-9 text-xs sm:text-sm">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="status-filter" onchange="applyFilters()" class="form-select text-xs">
+                            <option value="">All Payment Statuses</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Supplier / Distributor</th>
+                                <th class="text-right">Items</th>
+                                <th class="text-right">Amount</th>
+                                <th>Date</th>
+                                <th>Payment Type</th>
+                                <th>Payment Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchases-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="purchases-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let allPurchases = [];
+        let filteredPurchases = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('purchases', 'Purchases', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Purchases', path: 'purchases/index.html' }
+            ]);
+
+            loadPurchases();
+        });
+
+        function loadPurchases() {
+            allPurchases = MHP_DB.getPurchases();
+            filteredPurchases = [...allPurchases];
+
+            const total = allPurchases.reduce((acc, p) => acc + (Number(p.totalAmount) || 0), 0);
+            const due = allPurchases.reduce((acc, p) => acc + (Number(p.dueAmount) || 0), 0);
+
+            document.getElementById('stat-total-purchases').innerText = Utils.formatINR(total);
+            document.getElementById('stat-pending-payables').innerText = Utils.formatINR(due);
+
+            renderTable();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+            const status = document.getElementById('status-filter').value;
+
+            filteredPurchases = allPurchases.filter(p => {
+                const matchQ = !query || 
+                    p.invoiceNo.toLowerCase().includes(query) || 
+                    (p.supplierName && p.supplierName.toLowerCase().includes(query));
+                const matchStatus = !status || p.paymentStatus === status;
+                return matchQ && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('purchases-tbody');
+            const empty = document.getElementById('purchases-empty');
+
+            if (!filteredPurchases.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'truck',
+                    'No purchase invoices found',
+                    'No purchase bills matched your search criteria.',
+                    `<a href="create.html" class="btn-primary text-xs py-2 px-3.5">Record New Purchase</a>`
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredPurchases.map(p => `
+                <tr>
+                    <td class="font-bold text-slate-900">
+                        <a href="view.html?id=${p.invoiceNo}" class="text-primary hover:underline">${p.invoiceNo}</a>
+                    </td>
+                    <td>
+                        <span class="font-medium text-slate-800 text-sm block">${p.supplierName}</span>
+                    </td>
+                    <td class="text-right text-slate-700">${p.itemsCount || (p.items ? p.items.length : 0)}</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(p.totalAmount)}</td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(p.invoiceDate)}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${p.paymentType}</span></td>
+                    <td>${Components.renderStatusBadge(p.paymentStatus)}</td>
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1">
+                            <a href="view.html?id=${p.invoiceNo}" class="p-1.5 text-slate-600 hover:text-primary hover:bg-slate-100 rounded" title="View Bill">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </a>
+                            <a href="javascript:void(0)" onclick="window.print()" class="p-1.5 text-slate-600 hover:text-primary hover:bg-slate-100 rounded" title="Print Consignment Note">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportPurchases() {
+            const rows = filteredPurchases.map(p => ({
+                InvoiceNo: p.invoiceNo,
+                Supplier: p.supplierName,
+                ItemsCount: p.itemsCount,
+                Subtotal: p.subtotal,
+                GST: p.gst,
+                GrandTotal: p.totalAmount,
+                Date: p.invoiceDate,
+                PaymentType: p.paymentType,
+                PaymentStatus: p.paymentStatus,
+                PaidAmount: p.paidAmount,
+                DueAmount: p.dueAmount
+            }));
+            Utils.exportToCSV('MHP-Purchase-Invoices', rows);
+        }
+    </script>
+</body>
+</html>

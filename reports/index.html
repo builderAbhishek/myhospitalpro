@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports &amp; Analytics Hub — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Reports &amp; Executive Analytics</h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-0.5">Comprehensive audit reports for GST compliance, margin analysis, and stock valuation</p>
+                </div>
+            </div>
+
+            <!-- Quick Navigation Report Cards Grid (4 Primary Report Modules) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Card 1: Sales Analytics -->
+                <div class="app-card p-5 hover:border-primary transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900">Sales Reports</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Daily counter sales, payment method breakdowns (UPI/Cash/Card), and medicine volume trends.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-appborder">
+                        <a href="sales.html" class="text-xs font-bold text-primary hover:underline flex items-center justify-between">
+                            <span>Open Sales Report</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2: Purchase & Consignments -->
+                <div class="app-card p-5 hover:border-primary transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M19 18h2a1 1 0 0 0 1-1v-5.28a2 2 0 0 0-.8-1.6L18 8h-4"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900">Purchase Reports</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Vendor inward bills, distributor-wise procurement volumes, and GST input tax credit reconciliation.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-appborder">
+                        <a href="purchases.html" class="text-xs font-bold text-primary hover:underline flex items-center justify-between">
+                            <span>Open Purchase Report</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 3: Inventory Valuation -->
+                <div class="app-card p-5 hover:border-primary transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900">Inventory Valuation</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Total stock assets at cost vs MRP, category distribution, and slow-moving stock identification.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-appborder">
+                        <a href="inventory.html" class="text-xs font-bold text-primary hover:underline flex items-center justify-between">
+                            <span>Open Inventory Valuation</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 4: Profit & Loss Analysis -->
+                <div class="app-card p-5 hover:border-primary transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900">Profit &amp; Gross Margin</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Net sales revenue minus Cost of Goods Sold (COGS), gross margin percentages, and trade discounts.
+                        </p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-appborder">
+                        <a href="profit.html" class="text-xs font-bold text-emerald-700 hover:underline flex items-center justify-between">
+                            <span>Open Profit Analysis</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Financial Highlights Summary Panel -->
+            <div class="app-card p-6">
+                <div class="border-b border-appborder pb-4 mb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">FY 2026-27 Executive Financial Summary</h3>
+                        <p class="text-xs text-slate-500">Live aggregated metrics computed from mock sales and purchase ledger</p>
+                    </div>
+                    <span class="badge badge-info">Simulated Frontend ERP</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+                    <div>
+                        <span class="text-slate-400 block font-medium">Gross Pharmacy Sales</span>
+                        <span class="text-xl font-black text-slate-900 mt-1 block">₹48,258.00</span>
+                        <span class="text-[11px] text-emerald-600 font-bold">+14.2% YoY growth</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Cost of Goods Sold (COGS)</span>
+                        <span class="text-xl font-black text-slate-900 mt-1 block">₹32,840.00</span>
+                        <span class="text-[11px] text-slate-500">68.0% of revenue</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Estimated Gross Profit</span>
+                        <span class="text-xl font-black text-teal-700 mt-1 block">₹15,418.00</span>
+                        <span class="text-[11px] text-teal-700 font-bold">31.9% Gross Margin</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block font-medium">Total GST Collected</span>
+                        <span class="text-xl font-black text-slate-900 mt-1 block">₹5,790.00</span>
+                        <span class="text-[11px] text-slate-500">Input credit eligible</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('reports', 'Reports Hub', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Reports', path: 'reports/index.html' }
+            ]);
+        });
+    </script>
+</body>
+</html>

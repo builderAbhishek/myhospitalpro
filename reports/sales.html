@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Audit Report — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Pharmacy Sales Report</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Counter billing audit, tender breakdowns, and tax summaries</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportSalesReport()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button type="button" onclick="window.print()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls Strip -->
+            <div class="app-card p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="form-label">Date From</label>
+                        <input type="date" id="date-from" onchange="applySalesFilters()" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label">Date To</label>
+                        <input type="date" id="date-to" onchange="applySalesFilters()" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label">Payment Method</label>
+                        <select id="payment-filter" onchange="applySalesFilters()" class="form-select text-xs">
+                            <option value="">All Payment Modes</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI / Digital</option>
+                            <option value="Card">Credit / Debit Card</option>
+                            <option value="Credit">Credit Ledger</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="resetSalesFilters()" class="btn-secondary w-full text-xs py-2">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Metric Summary Strip (5 Cards) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Bills</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="rep-total-bills">0</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Invoices dispensed</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Gross Subtotal</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="rep-gross-sales">₹0.00</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Before discount</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Discounts</span>
+                    <div class="text-2xl font-extrabold text-rose-600" id="rep-total-disc">₹0.00</div>
+                    <span class="text-[11px] text-rose-700 mt-1 block font-medium">Scheme concessions</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">GST Tax Collected</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="rep-total-gst">₹0.00</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Output GST tax</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Net Sales Revenue</span>
+                    <div class="text-2xl font-extrabold text-teal-700" id="rep-net-sales">₹0.00</div>
+                    <span class="text-[11px] text-teal-700 font-bold mt-1 block">Grand Total</span>
+                </div>
+            </div>
+
+            <!-- Chart Row -->
+            <div class="app-card p-5">
+                <h3 class="font-bold text-slate-900 text-sm mb-4">Revenue Trend by Payment Mode</h3>
+                <div class="h-64 sm:h-72 w-full">
+                    <canvas id="salesReportChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Invoices Table Card -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Itemized Counter Invoices</h3>
+                        <p class="text-xs text-slate-500">Every sales transaction recorded in the selected period</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Patient / Customer</th>
+                                <th>Date &amp; Time</th>
+                                <th class="text-right">Items</th>
+                                <th class="text-right">Subtotal</th>
+                                <th class="text-right">Discount</th>
+                                <th class="text-right">GST</th>
+                                <th class="text-right">Grand Total</th>
+                                <th>Payment Mode</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-report-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="sales-report-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let allSales = [];
+        let filteredSales = [];
+        let reportChart = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('reports', 'Sales Report', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Reports', path: 'reports/index.html' },
+                { label: 'Sales Report', path: 'reports/sales.html' }
+            ]);
+
+            allSales = MHP_DB.getSales();
+            filteredSales = [...allSales];
+
+            // Set default date range to past 30 days
+            const today = new Date();
+            const past30 = new Date();
+            past30.setDate(past30.getDate() - 30);
+
+            document.getElementById('date-to').value = today.toISOString().split('T')[0];
+            document.getElementById('date-from').value = past30.toISOString().split('T')[0];
+
+            renderReport();
+            initReportChart();
+        });
+
+        function applySalesFilters() {
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+            const paymentMode = document.getElementById('payment-filter').value;
+
+            filteredSales = allSales.filter(s => {
+                const sDate = s.date.split('T')[0];
+                const matchFrom = !dateFrom || sDate >= dateFrom;
+                const matchTo = !dateTo || sDate <= dateTo;
+                const matchPay = !paymentMode || s.paymentMethod.includes(paymentMode);
+                return matchFrom && matchTo && matchPay;
+            });
+
+            renderReport();
+            updateReportChart();
+        }
+
+        function resetSalesFilters() {
+            document.getElementById('payment-filter').value = '';
+            filteredSales = [...allSales];
+            renderReport();
+            updateReportChart();
+        }
+
+        function renderReport() {
+            const totalBills = filteredSales.length;
+            const grossSubtotal = filteredSales.reduce((acc, s) => acc + (Number(s.subtotal) || 0), 0);
+            const totalDisc = filteredSales.reduce((acc, s) => acc + (Number(s.discount) || 0), 0);
+            const totalGst = filteredSales.reduce((acc, s) => acc + (Number(s.tax) || 0), 0);
+            const netSales = filteredSales.reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0);
+
+            document.getElementById('rep-total-bills').innerText = totalBills;
+            document.getElementById('rep-gross-sales').innerText = Utils.formatINR(grossSubtotal);
+            document.getElementById('rep-total-disc').innerText = Utils.formatINR(totalDisc);
+            document.getElementById('rep-total-gst').innerText = Utils.formatINR(totalGst);
+            document.getElementById('rep-net-sales').innerText = Utils.formatINR(netSales);
+
+            const tbody = document.getElementById('sales-report-tbody');
+            const empty = document.getElementById('sales-report-empty');
+
+            if (!filteredSales.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'receipt',
+                    'No sales invoices in selected period',
+                    'Try broadening your date filter range.'
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredSales.map(s => `
+                <tr>
+                    <td class="font-bold text-slate-900 font-mono">
+                        <a href="../billing/invoice.html?id=${s.invoiceNo}" class="text-primary hover:underline">${s.invoiceNo}</a>
+                    </td>
+                    <td>
+                        <span class="font-medium text-slate-800 text-xs block">${s.customerName}</span>
+                    </td>
+                    <td class="text-xs text-slate-500">${Utils.formatDateTime(s.date)}</td>
+                    <td class="text-right font-medium text-slate-700">${s.itemsCount || (s.items ? s.items.length : 0)}</td>
+                    <td class="text-right text-slate-600">${Utils.formatINR(s.subtotal)}</td>
+                    <td class="text-right text-rose-600 font-medium">${Utils.formatINR(s.discount || 0)}</td>
+                    <td class="text-right text-slate-600">${Utils.formatINR(s.tax || 0)}</td>
+                    <td class="text-right font-black text-slate-900">${Utils.formatINR(s.grandTotal)}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${s.paymentMethod}</span></td>
+                    <td class="text-right">
+                        <a href="../billing/invoice.html?id=${s.invoiceNo}" class="btn-secondary text-[11px] py-1 px-2.5">
+                            Print
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function initReportChart() {
+            const ctx = document.getElementById('salesReportChart').getContext('2d');
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#0f766e';
+
+            reportChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Cash Counter', 'UPI / PhonePe', 'Credit / Debit Card', 'Credit Ledger'],
+                    datasets: [{
+                        label: 'Revenue by Tender (₹)',
+                        data: [14200, 18500, 8400, 7158],
+                        backgroundColor: [
+                            primaryColor,
+                            '#14b8a6',
+                            '#3b82f6',
+                            '#f59e0b'
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (c) => ` Total: ${Utils.formatINR(c.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (v) => '₹' + v,
+                                font: { size: 10 }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateReportChart() {
+            if (!reportChart) return;
+            const cash = filteredSales.filter(s => s.paymentMethod.includes('Cash')).reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0);
+            const upi = filteredSales.filter(s => s.paymentMethod.includes('UPI')).reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0);
+            const card = filteredSales.filter(s => s.paymentMethod.includes('Card')).reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0);
+            const credit = filteredSales.filter(s => s.paymentMethod.includes('Credit')).reduce((acc, s) => acc + (Number(s.grandTotal) || 0), 0);
+
+            reportChart.data.datasets[0].data = [cash, upi, card, credit];
+            reportChart.update();
+        }
+
+        function exportSalesReport() {
+            const rows = filteredSales.map(s => ({
+                InvoiceNo: s.invoiceNo,
+                Customer: s.customerName,
+                Date: s.date,
+                ItemsCount: s.itemsCount,
+                Subtotal: s.subtotal,
+                Discount: s.discount,
+                TaxGST: s.tax,
+                GrandTotal: s.grandTotal,
+                PaymentMethod: s.paymentMethod,
+                Status: s.paymentStatus
+            }));
+            Utils.exportToCSV('MHP-Sales-Report', rows);
+        }
+    </script>
+</body>
+</html>

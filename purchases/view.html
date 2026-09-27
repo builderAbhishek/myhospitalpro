@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Bill Details — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder no-print">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight" id="pur-title">Purchase Bill Details</h1>
+                            <span id="pur-status-badge" class="badge badge-success">Paid</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5" id="pur-subtitle">Inward Consignment Voucher</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="index.html" class="btn-secondary text-xs py-2 px-3">Back to List</a>
+                    <button type="button" onclick="window.print()" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Print Consignment Voucher</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inward Voucher Overview Sheet -->
+            <div class="app-card p-6 space-y-6 print-invoice-sheet">
+                
+                <!-- Voucher Header Section -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-appborder">
+                    <div>
+                        <span class="text-xs uppercase font-extrabold tracking-wider text-teal-700 block">Vendor Inward Consignment</span>
+                        <h2 class="text-2xl font-black text-slate-900 mt-1 font-mono" id="disp-invoice-no">PUR-2026-0891</h2>
+                        <p class="text-xs text-slate-500 mt-0.5" id="disp-invoice-date">Received: 22 Sep 2026</p>
+                    </div>
+                    <div class="sm:text-right">
+                        <span class="text-xs text-slate-400 block">Inward Destination:</span>
+                        <span class="text-sm font-bold text-slate-800 block">${APP_CONFIG.hospital.storeName}</span>
+                        <span class="text-xs text-slate-500">${APP_CONFIG.hospital.address}, ${APP_CONFIG.hospital.city}</span>
+                    </div>
+                </div>
+
+                <!-- Vendor & Payment Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2">Vendor / Distributor</h4>
+                        <div class="text-sm font-bold text-slate-900" id="disp-supplier-name">—</div>
+                        <div class="text-xs text-slate-600 mt-1" id="disp-supplier-contact">—</div>
+                        <div class="text-xs text-slate-500 font-mono mt-0.5" id="disp-supplier-gstin">GSTIN: —</div>
+                    </div>
+                    <div class="md:text-right">
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2">Payment Terms &amp; Status</h4>
+                        <div class="text-sm font-bold text-slate-800" id="disp-payment-type">Credit</div>
+                        <div class="text-xs text-slate-600 mt-1" id="disp-payment-status">Status: Pending</div>
+                        <div class="text-xs text-amber-700 font-bold mt-0.5" id="disp-due-amount">Balance Due: ₹0.00</div>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Medicine Product</th>
+                                <th>Batch No</th>
+                                <th>Expiry</th>
+                                <th class="text-right">Qty</th>
+                                <th class="text-right">Free</th>
+                                <th class="text-right">Rate</th>
+                                <th class="text-right">MRP</th>
+                                <th class="text-right">GST</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disp-items-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Summary & Signatures -->
+                <div class="pt-4 border-t border-appborder grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
+                    <div class="text-xs text-slate-500 space-y-1">
+                        <p class="font-bold text-slate-700">Remarks / Inward Certification:</p>
+                        <p id="disp-notes">All boxes received in sealed condition. Verified batch integrity and cold-chain compliance where applicable.</p>
+                        <div class="pt-8">
+                            <span class="block border-t border-slate-300 w-48 text-[11px] text-slate-400 pt-1">Receiving Pharmacist Signature</span>
+                        </div>
+                    </div>
+                    <div class="sm:text-right space-y-1 text-xs">
+                        <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                            <span>Subtotal:</span>
+                            <span class="font-bold text-slate-800" id="disp-subtotal">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                            <span>Discount / Schemes:</span>
+                            <span class="font-bold text-rose-600" id="disp-discount">- ₹0.00</span>
+                        </div>
+                        <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                            <span>GST Input Tax Credit:</span>
+                            <span class="font-bold text-slate-800" id="disp-gst">+ ₹0.00</span>
+                        </div>
+                        <div class="flex justify-between sm:justify-end gap-6 text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+                            <span>Grand Total:</span>
+                            <span class="text-teal-700" id="disp-total">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between sm:justify-end gap-6 text-xs font-semibold text-slate-700 pt-1">
+                            <span>Amount Paid:</span>
+                            <span id="disp-paid">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const invoiceParam = Utils.getUrlParam('id') || 'PUR-2026-0891';
+            const purchase = MHP_DB.getPurchaseById(invoiceParam);
+
+            Components.initLayout('purchases', 'Purchase Voucher', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Purchases', path: 'purchases/index.html' },
+                { label: purchase ? purchase.invoiceNo : 'Voucher', path: `purchases/view.html?id=${invoiceParam}` }
+            ]);
+
+            if (!purchase) {
+                showToast('Purchase invoice not found', 'error');
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+
+            renderPurchase(purchase);
+        });
+
+        function renderPurchase(p) {
+            document.getElementById('disp-invoice-no').innerText = p.invoiceNo;
+            document.getElementById('disp-invoice-date').innerText = `Consignment Date: ${Utils.formatDate(p.invoiceDate)}`;
+            document.getElementById('pur-title').innerText = `${p.invoiceNo}`;
+            document.getElementById('pur-subtitle').innerText = `Supplier: ${p.supplierName}`;
+
+            const statusBadge = document.getElementById('pur-status-badge');
+            statusBadge.innerText = p.paymentStatus;
+            statusBadge.className = p.paymentStatus === 'Paid' ? 'badge badge-success' : 'badge badge-warning';
+
+            document.getElementById('disp-supplier-name').innerText = p.supplierName;
+            const supplier = MHP_DB.getSupplierById(p.supplierId);
+            if (supplier) {
+                document.getElementById('disp-supplier-contact').innerText = `${supplier.contactPerson} • ${supplier.phone}`;
+                document.getElementById('disp-supplier-gstin').innerText = `GSTIN: ${supplier.gstin} | DL: ${supplier.drugLicence}`;
+            }
+
+            document.getElementById('disp-payment-type').innerText = p.paymentType || 'Credit';
+            document.getElementById('disp-payment-status').innerText = `Status: ${p.paymentStatus}`;
+            document.getElementById('disp-due-amount').innerText = `Balance Due: ${Utils.formatINR(p.dueAmount || 0)}`;
+
+            document.getElementById('disp-subtotal').innerText = Utils.formatINR(p.subtotal || p.totalAmount);
+            document.getElementById('disp-discount').innerText = `- ${Utils.formatINR(p.discount || 0)}`;
+            document.getElementById('disp-gst').innerText = `+ ${Utils.formatINR(p.gst || 0)}`;
+            document.getElementById('disp-total').innerText = Utils.formatINR(p.totalAmount);
+            document.getElementById('disp-paid').innerText = Utils.formatINR(p.paidAmount || 0);
+
+            if (p.notes) {
+                document.getElementById('disp-notes').innerText = p.notes;
+            }
+
+            const tbody = document.getElementById('disp-items-tbody');
+            tbody.innerHTML = (p.items || []).map((item, idx) => `
+                <tr>
+                    <td class="text-slate-400 font-mono text-xs">${idx + 1}</td>
+                    <td class="font-bold text-slate-800">${item.name}</td>
+                    <td class="font-mono text-xs text-slate-700">${item.batchNo}</td>
+                    <td class="text-xs text-slate-600">${Utils.formatDate(item.expiry)}</td>
+                    <td class="text-right font-bold text-slate-900">${item.qty}</td>
+                    <td class="text-right text-slate-500">${item.free || 0}</td>
+                    <td class="text-right text-slate-700">${Utils.formatINR(item.rate)}</td>
+                    <td class="text-right text-slate-500">${Utils.formatINR(item.mrp)}</td>
+                    <td class="text-right text-xs text-slate-600">${item.gst || 12}%</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(item.total)}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

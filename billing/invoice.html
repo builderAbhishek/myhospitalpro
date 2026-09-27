@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 11pt !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-invoice-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased min-h-screen py-6 px-4">
+
+    <!-- Action Toolbar (Hidden during print) -->
+    <div class="max-w-4xl mx-auto mb-4 flex items-center justify-between no-print">
+        <a href="index.html" class="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            <span>Back to POS Counter</span>
+        </a>
+
+        <div class="flex items-center gap-2">
+            <a href="index.html" class="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <span>New Bill (F2)</span>
+            </a>
+            <button type="button" onclick="window.print()" class="btn-primary text-xs py-2 px-4 shadow-sm flex items-center gap-1.5 font-bold">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                <span>Print Tax Invoice</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Official Hospital Pharmacy Tax Invoice Sheet -->
+    <div class="max-w-4xl mx-auto bg-white border border-slate-300 rounded-xl shadow-lg p-6 sm:p-10 print-invoice-sheet text-slate-900">
+        
+        <!-- Header: Hospital Branding, DL, GSTIN -->
+        <div class="border-b-2 border-slate-800 pb-5">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="../assets/images/logo.svg" alt="MHP Logo" class="w-12 h-12 rounded-lg" onerror="this.src='../assets/images/favicon.svg'">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900" id="inv-hosp-name">
+                            MY HOSPITAL PRO
+                        </h1>
+                        <p class="text-xs font-bold text-teal-800 tracking-wide uppercase" id="inv-store-name">
+                            Central In-House Pharmacy &amp; Surgical Store
+                        </p>
+                        <p class="text-[11px] text-slate-600 mt-0.5" id="inv-hosp-address">
+                            Plot 42, Health City Boulevard, Sector 9, Rohini, New Delhi - 110085
+                        </p>
+                        <p class="text-[11px] text-slate-600">
+                            Phone: +91 98765 43210 &bull; Email: pharmacy@myhospitalpro.in
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sm:text-right shrink-0">
+                    <span class="inline-block px-3 py-1 bg-slate-900 text-white font-extrabold text-xs uppercase tracking-wider rounded">
+                        GST TAX INVOICE
+                    </span>
+                    <div class="mt-2 text-xs font-mono space-y-0.5">
+                        <div><strong class="text-slate-800">GSTIN:</strong> <span id="inv-gstin">07AAAAA0000A1Z5</span></div>
+                        <div><strong class="text-slate-800">D.L. No:</strong> <span id="inv-dl">20B-883491 / 21B-883492</span></div>
+                        <div><strong class="text-slate-800">FSSAI:</strong> 13322001000492</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice & Patient Metadata Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-b border-slate-200 text-xs">
+            <div>
+                <div class="space-y-1">
+                    <div><span class="text-slate-500 font-medium">Patient / Customer:</span> <strong class="text-slate-900 text-sm" id="inv-patient-name">Rajesh Sharma</strong></div>
+                    <div><span class="text-slate-500 font-medium">Contact Mobile:</span> <span class="font-mono text-slate-800" id="inv-patient-phone">+91 98101 23456</span></div>
+                    <div><span class="text-slate-500 font-medium">Prescribing Doctor:</span> <span class="text-slate-800" id="inv-doctor-name">Dr. K. Singhal (Cardiology)</span></div>
+                </div>
+            </div>
+            <div class="sm:text-right">
+                <div class="space-y-1">
+                    <div><span class="text-slate-500 font-medium">Invoice Number:</span> <strong class="text-slate-900 text-sm font-mono" id="inv-number">INV-2026-0042</strong></div>
+                    <div><span class="text-slate-500 font-medium">Invoice Date &amp; Time:</span> <span class="text-slate-800" id="inv-date-time">27 Sep 2026, 10:15 AM</span></div>
+                    <div><span class="text-slate-500 font-medium">Tender / Mode:</span> <span class="font-semibold text-teal-800" id="inv-payment-mode">UPI / PhonePe</span></div>
+                    <div><span class="text-slate-500 font-medium">Dispensed By:</span> <span class="text-slate-700">Dr. Arvind Sharma (Reg. Pharmacist)</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itemized Medicine Table -->
+        <div class="py-4 overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 text-[11px] uppercase font-bold text-slate-800 tracking-wider">
+                        <th class="py-2 pr-2">#</th>
+                        <th class="py-2">Description of Medicine</th>
+                        <th class="py-2 font-mono">HSN</th>
+                        <th class="py-2 font-mono">Batch</th>
+                        <th class="py-2">Exp</th>
+                        <th class="py-2 text-right">Qty</th>
+                        <th class="py-2 text-right">MRP (₹)</th>
+                        <th class="py-2 text-right">Rate (₹)</th>
+                        <th class="py-2 text-right">Disc%</th>
+                        <th class="py-2 text-right">GST%</th>
+                        <th class="py-2 text-right font-black">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="inv-items-tbody" class="divide-y divide-slate-200">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary Totals Calculation -->
+        <div class="pt-4 border-t-2 border-slate-800 grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left: Tax Breakdown & Amount in Words -->
+            <div class="sm:col-span-7 space-y-3 text-xs">
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                    <span class="font-bold text-slate-800 block text-[11px] uppercase tracking-wider mb-1">GST Tax Summary</span>
+                    <div class="grid grid-cols-3 gap-2 text-[11px] text-slate-600">
+                        <div>CGST (6%): <strong class="text-slate-900" id="inv-cgst">₹34.80</strong></div>
+                        <div>SGST (6%): <strong class="text-slate-900" id="inv-sgst">₹34.80</strong></div>
+                        <div>Total Tax: <strong class="text-slate-900" id="inv-total-tax">₹69.60</strong></div>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-slate-600">
+                    <span class="text-slate-500 font-medium">Amount in Words:</span>
+                    <strong class="text-slate-900 block capitalize" id="inv-words">Rupees Six Hundred Fifty Only</strong>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="text-[10px] text-slate-500 leading-tight pt-2">
+                    <p class="font-bold text-slate-700 uppercase">Terms &amp; Conditions:</p>
+                    <ol class="list-decimal pl-3 space-y-0.5 mt-0.5">
+                        <li>Goods once sold can only be returned within 7 days against original tax invoice.</li>
+                        <li>Store medicines in cool, dry place away from sunlight. Refrigerator items must remain at 2°C–8°C.</li>
+                        <li>Prescription drugs (Schedule H / H1) are dispensed strictly on qualified doctor's prescription.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Right: Grand Totals -->
+            <div class="sm:col-span-5 space-y-1.5 text-xs sm:text-right">
+                <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                    <span>Subtotal:</span>
+                    <span class="font-bold text-slate-800" id="inv-subtotal">₹610.00</span>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                    <span>Total Discount:</span>
+                    <span class="font-bold text-rose-600" id="inv-discount">- ₹30.00</span>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                    <span>Total GST:</span>
+                    <span class="font-bold text-slate-800" id="inv-tax">+ ₹69.60</span>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-6 text-slate-600">
+                    <span>Round Off:</span>
+                    <span class="font-mono text-slate-500" id="inv-roundoff">+ ₹0.40</span>
+                </div>
+
+                <!-- Net Payable -->
+                <div class="flex justify-between sm:justify-end gap-6 pt-2 border-t-2 border-slate-800 text-sm font-black text-slate-900">
+                    <span>Net Amount Payable:</span>
+                    <span class="text-base text-teal-800" id="inv-grandtotal">₹650.00</span>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-6 text-xs text-slate-700 font-semibold pt-1">
+                    <span>Amount Paid:</span>
+                    <span id="inv-paid">₹650.00</span>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-6 text-xs text-slate-500">
+                    <span>Balance Due:</span>
+                    <span id="inv-balance">₹0.00</span>
+                </div>
+
+                <!-- Signatures -->
+                <div class="pt-8 sm:text-right">
+                    <span class="inline-block border-t border-slate-400 pt-1 text-[11px] text-slate-600 font-bold">
+                        For MY HOSPITAL PRO PHARMACY<br>
+                        <span class="font-normal text-[10px] text-slate-500">Authorized Registered Pharmacist</span>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const invoiceParam = Utils.getUrlParam('id');
+            let sale = null;
+
+            if (invoiceParam) {
+                sale = MHP_DB.getSaleById(invoiceParam);
+            }
+            if (!sale) {
+                const allSales = MHP_DB.getSales();
+                sale = allSales.length ? allSales[0] : null;
+            }
+
+            if (sale) {
+                renderInvoice(sale);
+            } else {
+                showToast('No invoice found to display', 'warning');
+            }
+        });
+
+        function renderInvoice(s) {
+            document.getElementById('inv-hosp-name').innerText = APP_CONFIG.hospital.legalName || APP_CONFIG.name;
+            document.getElementById('inv-store-name').innerText = APP_CONFIG.hospital.storeName;
+            document.getElementById('inv-hosp-address').innerText = `${APP_CONFIG.hospital.address}, ${APP_CONFIG.hospital.city} - ${APP_CONFIG.hospital.pincode}`;
+            document.getElementById('inv-gstin').innerText = APP_CONFIG.hospital.gstin;
+            document.getElementById('inv-dl').innerText = APP_CONFIG.hospital.dlNumber;
+
+            document.getElementById('inv-patient-name').innerText = s.customerName || 'Walk-in Customer';
+            document.getElementById('inv-patient-phone').innerText = s.customerMobile || '—';
+            document.getElementById('inv-doctor-name').innerText = s.doctorName || 'Dr. Self / General OPD';
+
+            document.getElementById('inv-number').innerText = s.invoiceNo;
+            document.getElementById('inv-date-time').innerText = Utils.formatDateTime(s.date);
+            document.getElementById('inv-payment-mode').innerText = s.paymentMethod || 'Cash';
+
+            const tbody = document.getElementById('inv-items-tbody');
+            tbody.innerHTML = (s.items || []).map((item, idx) => `
+                <tr class="py-1">
+                    <td class="py-1 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="py-1 font-bold text-slate-900">${item.name}</td>
+                    <td class="py-1 font-mono text-slate-600">3004</td>
+                    <td class="py-1 font-mono text-slate-700">${item.batchNo || 'GEN'}</td>
+                    <td class="py-1 text-slate-600">${item.exp || '—'}</td>
+                    <td class="py-1 text-right font-black text-slate-900">${item.qty}</td>
+                    <td class="py-1 text-right text-slate-500">${Utils.formatINR(item.mrp || item.rate, false)}</td>
+                    <td class="py-1 text-right text-slate-700">${Utils.formatINR(item.rate, false)}</td>
+                    <td class="py-1 text-right text-slate-500">${item.discount || 0}%</td>
+                    <td class="py-1 text-right text-slate-500">${item.gst || 12}%</td>
+                    <td class="py-1 text-right font-bold text-slate-900">${Utils.formatINR(item.total)}</td>
+                </tr>
+            `).join('');
+
+            const tax = Number(s.tax) || 0;
+            const halfTax = tax / 2;
+            document.getElementById('inv-cgst').innerText = Utils.formatINR(halfTax);
+            document.getElementById('inv-sgst').innerText = Utils.formatINR(halfTax);
+            document.getElementById('inv-total-tax').innerText = Utils.formatINR(tax);
+
+            document.getElementById('inv-subtotal').innerText = Utils.formatINR(s.subtotal);
+            document.getElementById('inv-discount').innerText = `- ${Utils.formatINR(s.discount || 0)}`;
+            document.getElementById('inv-tax').innerText = `+ ${Utils.formatINR(tax)}`;
+            document.getElementById('inv-roundoff').innerText = Utils.formatINR(s.roundOff || 0);
+            document.getElementById('inv-grandtotal').innerText = Utils.formatINR(s.grandTotal);
+            document.getElementById('inv-paid').innerText = Utils.formatINR(s.amountPaid || s.grandTotal);
+            document.getElementById('inv-balance').innerText = Utils.formatINR(s.balance || 0);
+        }
+    </script>
+</body>
+</html>

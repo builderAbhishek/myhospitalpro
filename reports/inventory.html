@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Valuation Report — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Inventory Valuation &amp; Stock Audit</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Asset valuation at cost vs realizable MRP, category distribution, and risk appraisal</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportValuationReport()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button type="button" onclick="window.print()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Metric Summary Strip (5 Cards) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Formulary</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="inv-rep-total-items">0</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Active drugs</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Asset Value (Cost)</span>
+                    <div class="text-2xl font-extrabold text-teal-700" id="inv-rep-cost-val">₹0.00</div>
+                    <span class="text-[11px] text-teal-700 font-bold mt-1 block">Net purchase cost</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Asset Value (MRP)</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="inv-rep-mrp-val">₹0.00</div>
+                    <span class="text-[11px] text-slate-400 mt-1 block">Realizable sales value</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Low Stock Alerts</span>
+                    <div class="text-2xl font-extrabold text-amber-600" id="inv-rep-low-count">0</div>
+                    <a href="../inventory/low-stock.html" class="text-[11px] text-amber-700 hover:underline mt-1 block font-semibold">View low stock &rarr;</a>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Expired / Risk</span>
+                    <div class="text-2xl font-extrabold text-rose-600" id="inv-rep-exp-count">0</div>
+                    <a href="../inventory/expiry.html" class="text-[11px] text-rose-700 hover:underline mt-1 block font-semibold">Expiry monitor &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Two Visuals: Category Valuation Doughnut + Formulary Table -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Category Share Chart (4 Cols) -->
+                <div class="lg:col-span-4 app-card p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Stock Valuation by Category</h3>
+                        <p class="text-xs text-slate-500">Asset distribution across dosage forms</p>
+                    </div>
+                    <div class="h-60 w-full my-auto flex items-center justify-center">
+                        <canvas id="categoryValuationChart"></canvas>
+                    </div>
+                    <div class="text-[11px] text-slate-400 text-center pt-2 border-t border-appborder">
+                        Tablets constitute majority of shelf assets
+                    </div>
+                </div>
+
+                <!-- Formulary Valuation Table (8 Cols) -->
+                <div class="lg:col-span-8 app-card overflow-hidden">
+                    <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Formulary Valuation Breakdown</h3>
+                            <p class="text-xs text-slate-500">Stock quantities and financial value per pharmaceutical item</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto max-h-[380px]">
+                        <table class="app-table text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Category</th>
+                                    <th class="text-right">Stock</th>
+                                    <th class="text-right">Cost Rate</th>
+                                    <th class="text-right">Total Cost</th>
+                                    <th class="text-right">Total MRP</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-valuation-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let medsList = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('reports', 'Inventory Report', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Reports', path: 'reports/index.html' },
+                { label: 'Inventory Valuation', path: 'reports/inventory.html' }
+            ]);
+
+            medsList = MHP_DB.getMedicines();
+            renderInventoryReport();
+        });
+
+        function renderInventoryReport() {
+            let totalCostVal = 0;
+            let totalMrpVal = 0;
+            let lowCount = 0;
+            let outCount = 0;
+            let expiredCount = 0;
+
+            const categoryTotals = {};
+
+            const rowsData = medsList.map(m => {
+                const totalStock = (m.batches || []).reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
+                const reorder = Number(m.reorderLevel) || 20;
+
+                const costRate = Number(m.purchasePrice) || 0;
+                const mrpRate = Number(m.mrp) || 0;
+
+                const medCostTotal = (m.batches || []).reduce((acc, b) => acc + ((Number(b.quantity) || 0) * (Number(b.purchaseRate) || costRate)), 0);
+                const medMrpTotal = (m.batches || []).reduce((acc, b) => acc + ((Number(b.quantity) || 0) * (Number(b.mrp) || mrpRate)), 0);
+
+                totalCostVal += medCostTotal;
+                totalMrpVal += medMrpTotal;
+
+                if (totalStock === 0) outCount++;
+                else if (totalStock <= reorder) lowCount++;
+
+                (m.batches || []).forEach(b => {
+                    if (Utils.getExpiryStatus(b.expiry).status === 'expired') expiredCount++;
+                });
+
+                const cat = m.category || 'Other';
+                categoryTotals[cat] = (categoryTotals[cat] || 0) + medCostTotal;
+
+                let status = 'In Stock';
+                if (totalStock === 0) status = 'Out of Stock';
+                else if (totalStock <= reorder) status = 'Low Stock';
+
+                return {
+                    name: m.name,
+                    category: m.category,
+                    stock: totalStock,
+                    costRate,
+                    mrpRate,
+                    medCostTotal,
+                    medMrpTotal,
+                    status
+                };
+            });
+
+            document.getElementById('inv-rep-total-items').innerText = medsList.length;
+            document.getElementById('inv-rep-cost-val').innerText = Utils.formatINR(totalCostVal);
+            document.getElementById('inv-rep-mrp-val').innerText = Utils.formatINR(totalMrpVal);
+            document.getElementById('inv-rep-low-count').innerText = lowCount;
+            document.getElementById('inv-rep-exp-count').innerText = expiredCount;
+
+            const tbody = document.getElementById('inventory-valuation-tbody');
+            tbody.innerHTML = rowsData.map(r => `
+                <tr>
+                    <td class="font-bold text-slate-800">${r.name}</td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${r.category}</span></td>
+                    <td class="text-right font-black ${r.stock === 0 ? 'text-rose-600' : 'text-slate-900'}">${r.stock}</td>
+                    <td class="text-right text-slate-600">${Utils.formatINR(r.costRate)}</td>
+                    <td class="text-right font-bold text-slate-900">${Utils.formatINR(r.medCostTotal)}</td>
+                    <td class="text-right text-slate-500">${Utils.formatINR(r.medMrpTotal)}</td>
+                    <td>${Components.renderStatusBadge(r.status)}</td>
+                </tr>
+            `).join('');
+
+            // Render Category Doughnut
+            const ctx = document.getElementById('categoryValuationChart').getContext('2d');
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#0f766e';
+
+            const catLabels = Object.keys(categoryTotals);
+            const catValues = Object.values(categoryTotals);
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        data: catValues,
+                        backgroundColor: [
+                            primaryColor,
+                            '#14b8a6',
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#ec4899'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (c) => ` ${c.label}: ${Utils.formatINR(c.raw)}`
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function exportValuationReport() {
+            const rows = medsList.map(m => {
+                const stock = (m.batches || []).reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
+                return {
+                    Medicine: m.name,
+                    Generic: m.genericName,
+                    Category: m.category,
+                    Stock: stock,
+                    CostRate: m.purchasePrice,
+                    MRP: m.mrp,
+                    TotalCostValuation: stock * (m.purchasePrice || 0),
+                    TotalMrpValuation: stock * (m.mrp || 0)
+                };
+            });
+            Utils.exportToCSV('MHP-Stock-Valuation-Audit', rows);
+        }
+    </script>
+</body>
+</html>

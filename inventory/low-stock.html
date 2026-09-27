@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Stock Alerts — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Low Stock &amp; Reorder Monitor</h1>
+                            <span class="badge badge-warning" id="low-count-badge">Calculating...</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Medicines with physical quantities below designated safety buffer levels</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="../purchases/create.html" class="btn-primary text-xs py-2 px-3.5 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        <span>Create Indent Purchase</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Urgent Callout Box -->
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <span class="p-2 bg-amber-100 text-amber-800 rounded-lg shrink-0">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                    </span>
+                    <div>
+                        <h4 class="text-sm font-bold text-amber-900">Safety Buffer Replenishment Required</h4>
+                        <p class="text-xs text-amber-800 mt-0.5">
+                            Items listed below have breached reorder thresholds. Suggested order quantities are calculated based on max shelf capacity minus current stock.
+                        </p>
+                    </div>
+                </div>
+                <div class="text-right shrink-0">
+                    <span class="text-xs text-amber-800 block">Est. Indent Cost:</span>
+                    <span class="text-base font-extrabold text-amber-950" id="est-indent-cost">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Low Stock Table Card -->
+            <div class="app-card overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Category</th>
+                                <th>Rack Location</th>
+                                <th class="text-right">Current Stock</th>
+                                <th class="text-right">Reorder Level</th>
+                                <th class="text-right">Suggested Order Qty</th>
+                                <th>Preferred Supplier</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="low-stock-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('inventory', 'Low Stock Monitor', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Inventory', path: 'inventory/index.html' },
+                { label: 'Low Stock', path: 'inventory/low-stock.html' }
+            ]);
+
+            renderLowStock();
+        });
+
+        function renderLowStock() {
+            const meds = MHP_DB.getMedicines();
+            const suppliers = MHP_DB.getSuppliers();
+            const tbody = document.getElementById('low-stock-tbody');
+            const empty = document.getElementById('low-stock-empty');
+
+            const lowStockItems = [];
+            let totalIndentCost = 0;
+
+            meds.forEach(m => {
+                const totalStock = (m.batches || []).reduce((acc, b) => acc + (Number(b.quantity) || 0), 0);
+                const reorder = Number(m.reorderLevel) || 25;
+                const maxStock = Number(m.maxStock) || 200;
+
+                if (totalStock <= reorder) {
+                    const suggestedQty = Math.max(10, maxStock - totalStock);
+                    const estCost = suggestedQty * (Number(m.purchasePrice) || 0);
+                    totalIndentCost += estCost;
+
+                    // Match supplier or assign primary
+                    const supplier = suppliers[m.id % suppliers.length] || suppliers[0];
+
+                    lowStockItems.push({
+                        ...m,
+                        currentStock: totalStock,
+                        suggestedQty,
+                        supplierName: supplier ? supplier.name : 'Apollo Healthcare Distributors'
+                    });
+                }
+            });
+
+            document.getElementById('low-count-badge').innerText = `${lowStockItems.length} Items Critical`;
+            document.getElementById('est-indent-cost').innerText = Utils.formatINR(totalIndentCost);
+
+            if (!lowStockItems.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'check-circle',
+                    'All Stocks Healthy',
+                    'All active medicines have physical inventories well above designated safety reorder thresholds.'
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = lowStockItems.map(item => `
+                <tr>
+                    <td>
+                        <a href="../medicines/view.html?id=${item.id}" class="font-bold text-slate-900 hover:text-primary transition-colors block text-sm">
+                            ${item.name}
+                        </a>
+                        <span class="text-xs text-slate-500">${item.genericName || ''}</span>
+                    </td>
+                    <td><span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${item.category}</span></td>
+                    <td class="font-mono text-xs text-slate-700">${item.rackNumber || 'N/A'}</td>
+                    <td class="text-right">
+                        <span class="font-black text-sm ${item.currentStock === 0 ? 'text-rose-600' : 'text-amber-600'}">
+                            ${item.currentStock} units
+                        </span>
+                    </td>
+                    <td class="text-right font-medium text-slate-600 text-xs">${item.reorderLevel} units</td>
+                    <td class="text-right">
+                        <span class="font-bold text-teal-700 text-sm bg-teal-50 px-2 py-0.5 rounded">
+                            +${item.suggestedQty}
+                        </span>
+                    </td>
+                    <td class="text-xs text-slate-700 truncate max-w-[180px]">${item.supplierName}</td>
+                    <td class="text-right">
+                        <a href="../purchases/create.html" class="btn-primary text-[11px] py-1 px-2.5 shadow-xs">
+                            Create Purchase
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

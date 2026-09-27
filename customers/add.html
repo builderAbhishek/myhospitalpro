@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient / Customer — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-appborder">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Register New Customer / Patient</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Create a dedicated customer profile for credit ledger and prescription history</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Registration Form -->
+            <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="app-card p-6 space-y-5 max-w-4xl">
+                
+                <h3 class="text-sm font-bold text-slate-900 pb-2 border-b border-appborder">Personal &amp; Contact Details</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="form-label" for="cust-name">Full Patient / Customer Name *</label>
+                        <input type="text" id="cust-name" required placeholder="e.g. Anand Mahindra" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-mobile">Primary Mobile Number *</label>
+                        <input type="tel" id="cust-mobile" required placeholder="+91 98101 00000" class="form-input text-xs font-mono">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-email">Email Address</label>
+                        <input type="email" id="cust-email" placeholder="patient@example.com" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-type">Customer Category</label>
+                        <select id="cust-type" class="form-select text-xs">
+                            <option value="Regular Patient">Regular Patient</option>
+                            <option value="VIP / Hospital Staff">VIP / Hospital Staff</option>
+                            <option value="Chronic Care Patient">Chronic Care Patient</option>
+                            <option value="Corporate / Institutional">Corporate / Institutional</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold text-slate-900 pt-3 pb-2 border-b border-appborder">Address &amp; Credit Configuration</h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div class="sm:col-span-2">
+                        <label class="form-label" for="cust-address">Street Address / House #</label>
+                        <input type="text" id="cust-address" placeholder="e.g. Flat 402, Block C, Prashant Vihar" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-city">City / District</label>
+                        <input type="text" id="cust-city" value="Delhi" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-state">State</label>
+                        <input type="text" id="cust-state" value="Delhi" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-pin">PIN Code</label>
+                        <input type="text" id="cust-pin" placeholder="110085" class="form-input text-xs font-mono">
+                    </div>
+                    <div>
+                        <label class="form-label" for="cust-limit">Credit Limit (₹)</label>
+                        <input type="number" id="cust-limit" value="5000" class="form-input text-xs font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label" for="cust-notes">Clinical or Billing Notes</label>
+                    <textarea id="cust-notes" rows="2" placeholder="Allergies, chronic conditions (Hypertension / Diabetic), or special discount agreements..." class="form-textarea text-xs"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-appborder">
+                    <a href="index.html" class="btn-secondary text-xs">Cancel</a>
+                    <button type="submit" class="btn-primary text-xs shadow-md">
+                        Save Customer Profile
+                    </button>
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('customers', 'Add Customer', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Customers', path: 'customers/index.html' },
+                { label: 'Add Customer', path: 'customers/add.html' }
+            ]);
+        });
+
+        function handleSaveCustomer(e) {
+            e.preventDefault();
+            const customer = {
+                name: document.getElementById('cust-name').value.trim(),
+                mobile: document.getElementById('cust-mobile').value.trim(),
+                email: document.getElementById('cust-email').value.trim(),
+                customerType: document.getElementById('cust-type').value,
+                address: document.getElementById('cust-address').value.trim(),
+                city: document.getElementById('cust-city').value.trim() || 'Delhi',
+                state: document.getElementById('cust-state').value.trim() || 'Delhi',
+                pin: document.getElementById('cust-pin').value.trim() || '110085',
+                creditLimit: Number(document.getElementById('cust-limit').value) || 5000,
+                notes: document.getElementById('cust-notes').value.trim(),
+                totalPurchases: 0,
+                outstanding: 0,
+                lastPurchase: Utils.getTodayISO(),
+                status: 'active'
+            };
+
+            const saved = MHP_DB.saveCustomer(customer);
+            showToast(`${saved.name} registered successfully!`, 'success');
+            setTimeout(() => {
+                window.location.href = `view.html?id=${saved.id}`;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

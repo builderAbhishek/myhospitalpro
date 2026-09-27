@@ -1,0 +1,126 @@
+/**
+ * MY HOSPITAL PRO — Centralized Theme Engine
+ * Themes are applied via data-theme attribute on <html> element:
+ * <html data-theme="default">, <html data-theme="emerald">, etc.
+ */
+
+:root,
+[data-theme="default"] {
+    --primary: #0f766e;        /* Professional Healthcare Teal */
+    --primary-dark: #115e59;
+    --primary-light: #ccfbf1;
+    --primary-hover: #0d6962;
+    --primary-rgb: 15, 118, 110;
+    --accent: #14b8a6;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #f1f5f9;
+    --surface-hover: #f8fafc;
+    --text: #0f172a;
+    --text-secondary: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --border-dark: #cbd5e1;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --sidebar-bg: #0d2926;
+    --sidebar-text: #e2e8f0;
+    --sidebar-active: #0f766e;
+    --sidebar-border: #133e3a;
+}
+
+[data-theme="emerald"] {
+    --primary: #15803d;        /* Emerald Green Healthcare */
+    --primary-dark: #166534;
+    --primary-light: #dcfce7;
+    --primary-hover: #147236;
+    --primary-rgb: 21, 128, 61;
+    --accent: #22c55e;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #f0fdf4;
+    --surface-hover: #f8fafc;
+    --text: #0f172a;
+    --text-secondary: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --border-dark: #cbd5e1;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --sidebar-bg: #0f2e1b;
+    --sidebar-text: #e2e8f0;
+    --sidebar-active: #15803d;
+    --sidebar-border: #184729;
+}
+
+[data-theme="royal"] {
+    --primary: #1d4ed8;        /* Royal Deep Indigo / Blue */
+    --primary-dark: #1e40af;
+    --primary-light: #dbeafe;
+    --primary-hover: #1e3a8a;
+    --primary-rgb: 29, 78, 216;
+    --accent: #3b82f6;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #eff6ff;
+    --surface-hover: #f8fafc;
+    --text: #0f172a;
+    --text-secondary: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --border-dark: #cbd5e1;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #e2e8f0;
+    --sidebar-active: #1d4ed8;
+    --sidebar-border: #1e293b;
+}
+
+[data-theme="warm"] {
+    --primary: #c2410c;        /* Warm Saffron / Rust Enterprise */
+    --primary-dark: #9a3412;
+    --primary-light: #ffedd5;
+    --primary-hover: #b43808;
+    --primary-rgb: 194, 65, 12;
+    --accent: #f97316;
+    --background: #fffbf7;
+    --surface: #ffffff;
+    --surface-alt: #fff7ed;
+    --surface-hover: #fef8f4;
+    --text: #1c1917;
+    --text-secondary: #44403c;
+    --muted: #78716c;
+    --border: #e7e5e4;
+    --border-dark: #d6d3d1;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --sidebar-bg: #291b14;
+    --sidebar-text: #f5f5f4;
+    --sidebar-active: #c2410c;
+    --sidebar-border: #442a1e;
+}

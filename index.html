@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — My Hospital Pro Pharmacy ERP</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/themes.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext min-h-screen flex flex-col justify-between antialiased selection:bg-primary-light selection:text-primary">
+
+    <!-- Top Minimal Bar -->
+    <header class="py-4 px-6 border-b border-appborder bg-surface flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <img src="assets/images/logo.svg" alt="Logo" class="w-9 h-9 rounded-lg shadow-xs" onerror="this.src='assets/images/favicon.svg'">
+            <div>
+                <span class="font-bold text-lg text-slate-900 tracking-tight" id="brand-name">My Hospital Pro</span>
+                <span class="hidden sm:inline-block ml-2 text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold border border-slate-200">Pharmacy ERP</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-appmuted">
+            <span class="hidden md:inline">Support: +91 98765 43210</span>
+            <span class="hidden md:inline">•</span>
+            <span class="font-medium text-slate-700">v1.0.0 Phase 1</span>
+        </div>
+    </header>
+
+    <!-- Main Container: Clean Split Auth Card -->
+    <main class="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 bg-surface border border-appborder rounded-2xl shadow-xl overflow-hidden">
+            
+            <!-- Left Column: Form -->
+            <div class="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between">
+                <div>
+                    <div class="mb-8">
+                        <span class="text-xs font-bold uppercase tracking-wider text-primary bg-primary-light px-2.5 py-1 rounded-full">Secure Staff Portal</span>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3 tracking-tight">Sign in to your pharmacy</h1>
+                        <p class="text-sm text-slate-500 mt-1">Manage medicines, sales counters, vendor invoices and stock.</p>
+                    </div>
+
+                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label for="username" class="form-label">Username or Staff Email</label>
+                            <input type="text" id="username" required value="admin" 
+                                   class="form-input text-sm" placeholder="e.g. admin or staff@hospital.com">
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="password" class="form-label mb-0">Password</label>
+                                <a href="javascript:void(0)" onclick="showToast('Password reset link has been dispatched to admin email.', 'info')" 
+                                   class="text-xs text-primary font-medium hover:underline">Forgot password?</a>
+                            </div>
+                            <input type="password" id="password" required value="admin123" 
+                                   class="form-input text-sm" placeholder="••••••••">
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
+                                <span class="text-xs text-slate-600 font-medium">Keep me signed in on this terminal</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" id="login-btn" class="w-full btn-primary py-2.5 text-sm font-semibold shadow-md">
+                            <span>Open Pharmacy ERP</span>
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </button>
+                    </form>
+
+                    <!-- Demo Credentials Helper Callout -->
+                    <div class="mt-6 p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                        <div class="text-xs text-slate-600">
+                            <span class="font-bold text-slate-800 block">Preconfigured Demo Credentials:</span>
+                            <span>User: <strong class="text-slate-900 font-mono">admin</strong> &bull; Pass: <strong class="text-slate-900 font-mono">admin123</strong></span>
+                        </div>
+                        <button type="button" onclick="fillDemo()" class="btn-secondary text-xs py-1 px-2.5">
+                            Auto Fill
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-appborder text-xs text-slate-400 flex items-center justify-between">
+                    <span>&copy; 2026 My Hospital Pro</span>
+                    <span class="text-slate-500 font-medium">ISO 9001:2015 &amp; Schedule H1 Ready</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Visual Value Proposition & Highlights -->
+            <div class="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 flex-col justify-between border-l border-slate-700/50">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-teal-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight text-white">Hospital-Grade Pharmacy Operations</h2>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                        Engineered specifically for Indian in-house hospital pharmacies and retail medical stores with multi-counter POS billing.
+                    </p>
+
+                    <div class="mt-8 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-md bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</span>
+                            <div>
+                                <h4 class="text-xs font-semibold text-white">Batch &amp; Expiry Prevention</h4>
+                                <p class="text-[11px] text-slate-400">Automated 30/60/90-day alert triggers and quarantined batches.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-md bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</span>
+                            <div>
+                                <h4 class="text-xs font-semibold text-white">High-Speed POS Billing</h4>
+                                <p class="text-[11px] text-slate-400">Instant barcode scanning, keyboard shortcuts, and GST tax invoice receipts.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-md bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">✓</span>
+                            <div>
+                                <h4 class="text-xs font-semibold text-white">White-Label &amp; Multi-Theme</h4>
+                                <p class="text-[11px] text-slate-400">Easily configured for hospital chains with one-line visual skin updates.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hospital info badge -->
+                <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-xs text-slate-300 flex items-center justify-between">
+                    <div>
+                        <span class="font-semibold text-white block">Central Store Node</span>
+                        <span class="text-[11px] text-slate-400">Rohini Health City, New Delhi</span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-3 px-6 text-center text-xs text-slate-400 border-t border-appborder bg-surface">
+        <span>My Hospital Pro Pharmacy Management System &bull; Domain: <a href="https://myhospitalpro.in" class="hover:text-primary underline">myhospitalpro.in</a></span>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        function fillDemo() {
+            document.getElementById('username').value = APP_CONFIG.demoAuth.username;
+            document.getElementById('password').value = APP_CONFIG.demoAuth.password;
+            showToast('Demo credentials auto-filled', 'info');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+
+            if (user === APP_CONFIG.demoAuth.username && pass === APP_CONFIG.demoAuth.password) {
+                sessionStorage.setItem('mhp_auth_token', 'demo-session-token');
+                sessionStorage.setItem('mhp_user', JSON.stringify(APP_CONFIG.demoAuth));
+                showToast('Welcome back, ' + APP_CONFIG.demoAuth.displayName, 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 400);
+            } else {
+                showToast('Invalid credentials. Use admin / admin123 for demo mode.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

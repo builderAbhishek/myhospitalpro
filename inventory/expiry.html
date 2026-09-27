@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Monitor — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Expiry Date Tracking</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Statutory batch surveillance for expired medicines and near-expiry stocks</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="stock-adjustment.html" class="btn-secondary text-xs py-2 px-3 text-rose-600">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <span>Write Off Expired</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tabbed Navigation Bar -->
+            <div class="app-card overflow-hidden">
+                <div class="flex border-b border-appborder bg-surface-alt px-4 overflow-x-auto text-xs font-semibold">
+                    <button onclick="setExpiryTab('expired', this)" class="expiry-tab py-3.5 px-4 border-b-2 border-rose-600 text-rose-600 flex items-center gap-2">
+                        <span>Already Expired</span>
+                        <span id="badge-expired" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">1</span>
+                    </button>
+                    <button onclick="setExpiryTab('30days', this)" class="expiry-tab py-3.5 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                        <span>Expiring in 30 Days</span>
+                        <span id="badge-30d" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">1</span>
+                    </button>
+                    <button onclick="setExpiryTab('60days', this)" class="expiry-tab py-3.5 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                        <span>Expiring in 60 Days</span>
+                        <span id="badge-60d" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">1</span>
+                    </button>
+                    <button onclick="setExpiryTab('90days', this)" class="expiry-tab py-3.5 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                        <span>Expiring in 90 Days</span>
+                        <span id="badge-90d" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
+                    </button>
+                </div>
+
+                <!-- Table Content -->
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Batch No</th>
+                                <th>Expiry Date</th>
+                                <th class="text-right">Quantity</th>
+                                <th class="text-right">Stock Valuation</th>
+                                <th>Urgency Status</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expiry-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="expiry-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let currentTab = 'expired';
+        let expiryCategorized = {
+            expired: [],
+            '30days': [],
+            '60days': [],
+            '90days': []
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('inventory', 'Expiry Tracking', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Inventory', path: 'inventory/index.html' },
+                { label: 'Expiry Monitor', path: 'inventory/expiry.html' }
+            ]);
+
+            categorizeExpiry();
+            renderTable();
+        });
+
+        function categorizeExpiry() {
+            const meds = MHP_DB.getMedicines();
+            expiryCategorized = { expired: [], '30days': [], '60days': [], '90days': [] };
+
+            meds.forEach(m => {
+                (m.batches || []).forEach(b => {
+                    if (Number(b.quantity) > 0) {
+                        const statusObj = Utils.getExpiryStatus(b.expiry);
+                        if (expiryCategorized[statusObj.status]) {
+                            expiryCategorized[statusObj.status].push({
+                                medId: m.id,
+                                medName: m.name,
+                                generic: m.genericName,
+                                batchNo: b.batchNo,
+                                expiry: b.expiry,
+                                quantity: b.quantity,
+                                rate: b.purchaseRate || m.purchasePrice,
+                                val: (Number(b.quantity) || 0) * (Number(b.purchaseRate) || Number(m.purchasePrice) || 0),
+                                statusObj
+                            });
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('badge-expired').innerText = expiryCategorized['expired'].length;
+            document.getElementById('badge-30d').innerText = expiryCategorized['30days'].length;
+            document.getElementById('badge-60d').innerText = expiryCategorized['60days'].length;
+            document.getElementById('badge-90d').innerText = expiryCategorized['90days'].length;
+        }
+
+        function setExpiryTab(tabKey, btn) {
+            currentTab = tabKey;
+            document.querySelectorAll('.expiry-tab').forEach(b => {
+                b.classList.remove('border-rose-600', 'text-rose-600', 'border-primary', 'text-primary');
+                b.classList.add('border-transparent', 'text-slate-500');
+            });
+            btn.classList.add(tabKey === 'expired' ? 'border-rose-600' : 'border-primary', tabKey === 'expired' ? 'text-rose-600' : 'text-primary');
+            btn.classList.remove('border-transparent', 'text-slate-500');
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const list = expiryCategorized[currentTab] || [];
+            const tbody = document.getElementById('expiry-tbody');
+            const empty = document.getElementById('expiry-empty');
+
+            if (!list.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'check-circle',
+                    'No batches in this category',
+                    `No active batches currently meet the "${currentTab}" expiry criteria.`
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = list.map(item => `
+                <tr>
+                    <td>
+                        <a href="../medicines/view.html?id=${item.medId}" class="font-bold text-slate-900 hover:text-primary transition-colors block text-sm">
+                            ${item.medName}
+                        </a>
+                        <span class="text-xs text-slate-500">${item.generic || ''}</span>
+                    </td>
+                    <td class="font-mono font-bold text-slate-800 text-xs">${item.batchNo}</td>
+                    <td class="text-xs font-semibold text-slate-700">${Utils.formatDate(item.expiry)}</td>
+                    <td class="text-right font-black text-sm text-slate-900">${item.quantity}</td>
+                    <td class="text-right font-bold text-slate-900 text-sm">${Utils.formatINR(item.val)}</td>
+                    <td>
+                        <span class="badge ${item.statusObj.badgeClass}">${item.statusObj.label}</span>
+                    </td>
+                    <td class="text-right">
+                        <a href="stock-adjustment.html?batch=${item.batchNo}&med=${item.medId}" class="btn-secondary text-[11px] py-1 px-2.5">
+                            Quarantine / Return
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

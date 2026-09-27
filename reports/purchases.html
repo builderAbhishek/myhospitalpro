@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Procurement Report — My Hospital Pro</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/themes.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body class="bg-appbg text-apptext flex h-screen overflow-hidden antialiased">
+
+    <!-- Global Dynamic Sidebar Container -->
+    <aside id="app-sidebar" class="transition-transform duration-200 z-30 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0"></aside>
+
+    <!-- Main Content Flow -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+            
+            <!-- Page Header Strip -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Purchase Procurement Report</h1>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5">Vendor inward consignments, distributor procurement metrics, and tax credit</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="exportPurchaseReport()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button type="button" onclick="window.print()" class="btn-secondary text-xs py-2 px-3">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls Strip -->
+            <div class="app-card p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="form-label">Date Filter</label>
+                        <input type="date" id="pur-date-filter" onchange="applyPurchaseFilters()" class="form-input text-xs">
+                    </div>
+                    <div>
+                        <label class="form-label">Supplier / Distributor</label>
+                        <select id="pur-supplier-filter" onchange="applyPurchaseFilters()" class="form-select text-xs">
+                            <option value="">All Suppliers</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Payment Status</label>
+                        <select id="pur-status-filter" onchange="applyPurchaseFilters()" class="form-select text-xs">
+                            <option value="">All Statuses</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="resetPurchaseFilters()" class="btn-secondary w-full text-xs py-2">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary KPI Strip (4 Cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Purchases</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-pur-subtotal">₹0.00</div>
+                    <span class="text-xs text-slate-400 mt-1 block">Gross procurement value</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">GST Input Tax Credit</span>
+                    <div class="text-2xl font-extrabold text-slate-900" id="stat-pur-gst">₹0.00</div>
+                    <span class="text-xs text-teal-700 font-medium mt-1 block">Eligible ITC</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Trade Discounts Received</span>
+                    <div class="text-2xl font-extrabold text-rose-600" id="stat-pur-disc">₹0.00</div>
+                    <span class="text-xs text-rose-700 font-medium mt-1 block">Distributor schemes</span>
+                </div>
+
+                <div class="app-card p-4">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Net Procurement Amount</span>
+                    <div class="text-2xl font-extrabold text-teal-700" id="stat-pur-net">₹0.00</div>
+                    <span class="text-xs text-teal-700 font-bold mt-1 block">Net Consignment Dues</span>
+                </div>
+            </div>
+
+            <!-- Detailed Inward Bills Table -->
+            <div class="app-card overflow-hidden">
+                <div class="p-4 border-b border-appborder bg-surface-alt flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Procurement Invoices Breakdown</h3>
+                        <p class="text-xs text-slate-500">Itemized vendor bills matching criteria</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Supplier / Distributor</th>
+                                <th>Date</th>
+                                <th class="text-right">Items</th>
+                                <th class="text-right">Subtotal</th>
+                                <th class="text-right">GST</th>
+                                <th class="text-right">Discount</th>
+                                <th class="text-right">Net Bill Amount</th>
+                                <th>Payment Status</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchase-report-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="purchase-report-empty" class="hidden"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script>
+        let allPurchases = [];
+        let filteredPurchases = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Components.initLayout('reports', 'Purchase Report', [
+                { label: 'Dashboard', path: 'dashboard.html' },
+                { label: 'Reports', path: 'reports/index.html' },
+                { label: 'Purchases Report', path: 'reports/purchases.html' }
+            ]);
+
+            allPurchases = MHP_DB.getPurchases();
+            filteredPurchases = [...allPurchases];
+
+            loadSupplierFilter();
+            renderReport();
+        });
+
+        function loadSupplierFilter() {
+            const select = document.getElementById('pur-supplier-filter');
+            const suppliers = MHP_DB.getSuppliers();
+            select.innerHTML = `<option value="">All Suppliers</option>` + suppliers.map(s => `
+                <option value="${s.id}">${s.name}</option>
+            `).join('');
+        }
+
+        function applyPurchaseFilters() {
+            const date = document.getElementById('pur-date-filter').value;
+            const supplierId = document.getElementById('pur-supplier-filter').value;
+            const status = document.getElementById('pur-status-filter').value;
+
+            filteredPurchases = allPurchases.filter(p => {
+                const matchD = !date || p.invoiceDate === date;
+                const matchS = !supplierId || Number(p.supplierId) === Number(supplierId);
+                const matchStat = !status || p.paymentStatus === status;
+                return matchD && matchS && matchStat;
+            });
+
+            renderReport();
+        }
+
+        function resetPurchaseFilters() {
+            document.getElementById('pur-date-filter').value = '';
+            document.getElementById('pur-supplier-filter').value = '';
+            document.getElementById('pur-status-filter').value = '';
+            filteredPurchases = [...allPurchases];
+            renderReport();
+        }
+
+        function renderReport() {
+            const subtotal = filteredPurchases.reduce((acc, p) => acc + (Number(p.subtotal) || Number(p.totalAmount) || 0), 0);
+            const gst = filteredPurchases.reduce((acc, p) => acc + (Number(p.gst) || 0), 0);
+            const disc = filteredPurchases.reduce((acc, p) => acc + (Number(p.discount) || 0), 0);
+            const net = filteredPurchases.reduce((acc, p) => acc + (Number(p.totalAmount) || 0), 0);
+
+            document.getElementById('stat-pur-subtotal').innerText = Utils.formatINR(subtotal);
+            document.getElementById('stat-pur-gst').innerText = Utils.formatINR(gst);
+            document.getElementById('stat-pur-disc').innerText = Utils.formatINR(disc);
+            document.getElementById('stat-pur-net').innerText = Utils.formatINR(net);
+
+            const tbody = document.getElementById('purchase-report-tbody');
+            const empty = document.getElementById('purchase-report-empty');
+
+            if (!filteredPurchases.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = Components.renderEmptyState(
+                    'truck',
+                    'No purchase invoices found',
+                    'Try clearing your date or supplier filters.'
+                );
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = filteredPurchases.map(p => `
+                <tr>
+                    <td class="font-bold text-slate-900 font-mono">
+                        <a href="../purchases/view.html?id=${p.invoiceNo}" class="text-primary hover:underline">${p.invoiceNo}</a>
+                    </td>
+                    <td>
+                        <span class="font-medium text-slate-800 text-xs block">${p.supplierName}</span>
+                    </td>
+                    <td class="text-xs text-slate-500">${Utils.formatDate(p.invoiceDate)}</td>
+                    <td class="text-right text-slate-700">${p.itemsCount || (p.items ? p.items.length : 0)}</td>
+                    <td class="text-right text-slate-600">${Utils.formatINR(p.subtotal || p.totalAmount)}</td>
+                    <td class="text-right text-slate-600">${Utils.formatINR(p.gst || 0)}</td>
+                    <td class="text-right text-rose-600 font-medium">${Utils.formatINR(p.discount || 0)}</td>
+                    <td class="text-right font-black text-slate-900">${Utils.formatINR(p.totalAmount)}</td>
+                    <td>${Components.renderStatusBadge(p.paymentStatus)}</td>
+                    <td class="text-right">
+                        <a href="../purchases/view.html?id=${p.invoiceNo}" class="btn-secondary text-[11px] py-1 px-2.5">
+                            View Bill
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportPurchaseReport() {
+            const rows = filteredPurchases.map(p => ({
+                InvoiceNo: p.invoiceNo,
+                Supplier: p.supplierName,
+                Date: p.invoiceDate,
+                ItemsCount: p.itemsCount,
+                Subtotal: p.subtotal,
+                GST: p.gst,
+                Discount: p.discount,
+                TotalAmount: p.totalAmount,
+                Status: p.paymentStatus
+            }));
+            Utils.exportToCSV('MHP-Purchases-Report', rows);
+        }
+    </script>
+</body>
+</html>
